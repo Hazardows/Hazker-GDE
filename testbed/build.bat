@@ -14,8 +14,8 @@ FOR /R %%f in (*.cpp) do (
     SET cppFilenames=!cppFilenames! "%%f"
 )
 
-IF NOT EXIST "..\bin\obj" ( 
-    mkdir "..\bin\obj" 
+IF NOT EXIST "..\obj\testbed\src" ( 
+    mkdir "..\obj\testbed\src" 
 )
 
 REM Debugging output (optional)
@@ -32,24 +32,24 @@ SET linkerFlags=-L"..\bin" -lhazkerEngine -lmsvcrtd
 SET defines=-D_DEBUG -DHIMPORT
 
 REM Delete all .o files in the output directory 
-DEL "..\bin\obj\*.o"
+DEL "..\obj\testbed\src\*.o"
 
 ECHO "Building %assembly%..."
 
 REM Compile C++ files
 FOR %%f in (%cppFilenames%) DO (
-    clang++ %%f %compilerFlags% %defines% %includeFlags% -c -o "..\bin\obj\%%~nf.o"
+    clang++ %%f %compilerFlags% %defines% %includeFlags% -c -o "..\obj\testbed\src\%%~nf.o"
 )
 
 REM Compile C files
 FOR %%f in (%cFilenames%) DO (
-    clang %%f %compilerFlags% %defines% %includeFlags% -c -o "..\bin\obj\%%~nf.o"
+    clang %%f %compilerFlags% %defines% %includeFlags% -c -o "..\obj\testbed\src\%%~nf.o"
 )
 
 REM Collect all object files
 SET objFiles=
 FOR %%f in (%cppFilenames% %cFilenames%) DO (
-    SET objFiles=!objFiles! "..\bin\obj\%%~nf.o"
+    SET objFiles=!objFiles! "..\obj\testbed\src\%%~nf.o"
 )
 
 ECHO "Linking..."

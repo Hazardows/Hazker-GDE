@@ -247,4 +247,282 @@ HINLINE f32 vec2_distance(vec2 vector_a, vec2 vector_b) {
 // Vector 3 (vec3)
 // -----------------------------------------------
 
-// TODO: implement
+/**
+ * @brief Creates and returns a new 3-element vector using the supplied values.
+ * 
+ * @param x The x value.
+ * @param y The y value.
+ * @param z The z value.
+ * @return A new 3-element vector.
+ */
+HINLINE vec3 vec3_create(f32 x, f32 y, f32 z) {
+    return (vec3){x, y, z};
+}
+
+/**
+ * @brief Returns a new vec3 containing the x, y and z components of the 
+ * supplied vec4, essentially dropping the w component.
+ * 
+ * @param vector The 4-component vector to extract from.
+ * @return A new vec3 
+ */
+HINLINE vec3 vec3_from_vec4(vec4 vector) {
+    return (vec3){vector.x, vector.y, vector.z};
+}
+
+/**
+ * @brief Returns a new vec4 using vector as the x, y and z components and w for w.
+ * 
+ * @param vector The 3-component vector.
+ * @param w The w component.
+ * @return A new vec4 
+ */
+HINLINE vec4 vec3_to_vec4(vec3 vector, f32 w) {
+    return (vec4){vector.x, vector.y, vector.z, w};
+}
+
+/**
+ * @brief Creates and returns a 3-component vector with all components set to 0.0f.
+ */
+HINLINE vec3 vec3_zero() {
+    return (vec3){0.0f, 0.0f, 0.0f};
+}
+
+/**
+ * @brief Creates and returns a 3-component vector with all components set to 1.0f.
+ */
+HINLINE vec3 vec3_one() {
+    return (vec3){1.0f, 1.0f, 1.0f};
+}
+
+/**
+ * @brief Creates and returns a 3-component vector pointing up (0, 1, 0).
+ */
+HINLINE vec3 vec3_up() {
+    return (vec3){0.0f, 1.0f, 0.0f};
+}
+
+/**
+ * @brief Creates and returns a 3-component vector pointing down (0, -1, 0).
+ */
+HINLINE vec3 vec3_down() {
+    return (vec3){0.0f, -1.0f, 0.0f};
+}
+
+/**
+ * @brief Creates and returns a 3-component vector pointing left (-1, 0, 0).
+ */
+HINLINE vec3 vec3_left() {
+    return (vec3){-1.0f, 0.0f, 0.0f};
+}
+
+/**
+ * @brief Creates and returns a 3-component vector pointing right (1, 0, 0).
+ */
+HINLINE vec3 vec3_right() {
+    return (vec3){1.0f, 0.0f, 0.0f};
+}
+
+/**
+ * @brief Creates and returns a 3-component vector pointing forward (0, 0, -1).
+ */
+HINLINE vec3 vec3_forward() {
+    return (vec3){0.0f, 0.0f, -1.0f};
+}
+
+/**
+ * @brief Creates and returns a 3-component vector pointing backward (0, 0, 1).
+ */
+HINLINE vec3 vec3_back() {
+    return (vec3){0.0f, 0.0f, 1.0f};
+}
+
+/**
+ * @brief Adds vector_a to vector_b and returns a copy of the result.
+ * 
+ * @param vector_a The first vector.
+ * @param vector_b The second vector.
+ * @return The resulting vector. 
+ */
+HINLINE vec3 vec3_add(vec3 vector_a, vec3 vector_b) {
+    return (vec3){
+        vector_a.x + vector_b.x,
+        vector_a.y + vector_b.y,
+        vector_a.z + vector_b.z
+    };
+}
+
+/**
+ * @brief Subtracts vector_b from vector_a and returns a copy of the result.
+ * 
+ * @param vector_a The first vector.
+ * @param vector_b The second vector.
+ * @return The resulting vector. 
+ */
+HINLINE vec3 vec3_sub(vec3 vector_a, vec3 vector_b) {
+    return (vec3){
+        vector_a.x - vector_b.x,
+        vector_a.y - vector_b.y,
+        vector_a.z - vector_b.z
+    };
+}
+
+/**
+ * @brief Multiplies vector_a by vector_b and returns a copy of the result.
+ * 
+ * @param vector_a The first vector.
+ * @param vector_b The second vector.
+ * @return The resulting vector. 
+ */
+HINLINE vec3 vec3_mul(vec3 vector_a, vec3 vector_b) {
+    return (vec3){
+        vector_a.x * vector_b.x,
+        vector_a.y * vector_b.y,
+        vector_a.z * vector_b.z
+    };
+}
+
+/**
+ * @brief Multiplies all elements of a vec2 by scalar and returns a copy of the result.
+ * 
+ * @param vector The vector to be multiplied.
+ * @param scalar The scalar value.
+ * @return A copy of the resulting vector.
+ */
+HINLINE vec3 vec3_mul_scalar(vec3 vector, f32 scalar) {
+    return (vec3){
+        vector.x * scalar,
+        vector.y * scalar,
+        vector.z * scalar
+    };
+}
+
+/**
+ * @brief Divides vector_a by vector_b and returns a copy of the result.
+ * 
+ * @param vector_a The first vector.
+ * @param vector_b The second vector.
+ * @return The resulting vector. 
+ */
+HINLINE vec3 vec3_div(vec3 vector_a, vec3 vector_b) {
+    return (vec3){
+        vector_a.x / vector_b.x,
+        vector_a.y / vector_b.y,
+        vector_a.z / vector_b.z
+    };
+}
+
+/**
+ * @brief Returns the squared length of the provided vector.
+ * 
+ * @param vector The vector to retrieve the squared length of.
+ * @return The squared length.
+ */
+HINLINE f32 vec3_length_squared(vec3 vector) {
+    return vector.x * vector.x + vector.y * vector.y + vector.z * vector.z;
+}
+
+/**
+ * @brief Returns the length of the provided vector.
+ * 
+ * @param vector The vector to retrieve the length of.
+ * @return The length.
+ */
+HINLINE f32 vec3_length(vec3 vector) {
+    return hsqrt(vec3_length_squared(vector));
+}
+
+/**
+ * @brief Normalizes the provided vector in place to a unit vector.
+ * 
+ * @param vector A pointer to the vector to be normalized.
+ */
+HINLINE void vec3_normalize(vec3* vector) {
+    const f32 length = vec3_length(*vector);
+    vector->x /= length;
+    vector->y /= length;
+    vector->z /= length;
+}
+
+/**
+ * @brief Returns a normalized copy of the supplied vector.
+ * 
+ * @param vector The vector to be normalized.
+ * @return A normalized copy of the supplied vector 
+ */
+HINLINE vec3 vec3_normalized(vec3 vector) {
+    vec3_normalize(&vector);
+    return vector;
+}
+
+/**
+ * @brief Returns the dot product between the provided vectors. Typically used
+ * to calculate the difference in direction.
+ * 
+ * @param vector_a The first vector.
+ * @param vector_b The second vector.
+ * @return The dot product. 
+ */
+HINLINE f32 vec3_dot(vec3 vector_a, vec3 vector_b) {
+    f32 p = 0;
+    p += vector_a.x * vector_b.x;
+    p += vector_a.y * vector_b.y;
+    p += vector_a.z * vector_b.z;
+    return p;
+}
+
+/**
+ * @brief Calculates and returns the cross product of the supplied vectors.
+ * The cross product is a new vector which is orthoganal to both provided vectors.
+ * 
+ * @param vector_a The first vector.
+ * @param vector_b The second vector.
+ * @return The cross product. 
+ */
+HINLINE vec3 vec3_cross(vec3 vector_a, vec3 vector_b) {
+    return (vec3){
+        vector_a.y * vector_b.z - vector_a.z * vector_b.y,
+        vector_a.z * vector_b.x - vector_a.x * vector_b.z,
+        vector_a.x * vector_b.y - vector_a.y * vector_b.x
+    };
+}
+
+/**
+ * @brief Compares all elements of vector_a and vector_b and ensures the difference
+ * is less than tolerance.
+ * 
+ * @param vector_a The first vector.
+ * @param vector_b The second vector.
+ * @param tolerance The difference tolerance. Typically K_FLOAT_EPSILON or similar.
+ * @return True if within tolerance; otherwise false. 
+ */
+HINLINE const b8 vec3_compare(vec3 vector_a, vec3 vector_b, f32 tolerance) {
+    if (habs(vector_a.x - vector_b.x) > tolerance) {
+        return false;
+    }
+
+    if (habs(vector_a.y - vector_b.y) > tolerance) {
+        return false;
+    }
+
+    if (habs(vector_a.z - vector_b.z) > tolerance) {
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief Returns the distance between vector_a and vector_b.
+ * 
+ * @param vector_a The first vector.
+ * @param vector_b The second vector.
+ * @return The distance between vector_a and vector_b.
+ */
+HINLINE f32 vec3_distance(vec3 vector_a, vec3 vector_b) {
+    vec3 d = (vec3){
+        vector_a.x - vector_b.x,
+        vector_a.y - vector_b.y,
+        vector_a.z - vector_b.z};
+    return vec3_length(d);
+}

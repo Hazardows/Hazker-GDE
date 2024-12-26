@@ -18,7 +18,8 @@ REM Debugging output (optional)
 REM echo Files: %cFilenames%
 
 SET assembly=hazkerEngine
-SET compilerFlags=-g -shared -Wvarargs -Wall -Werror
+SET compilerFlags=-g -shared -Wvarargs -Wall -Werror -fdeclspec -Wmissing-braces
+
 REM -Wall -Werror
 
 REM Include flags

@@ -2,6 +2,9 @@
 
 #include "defines.h"
 
+// Temporal definition to allow compiling
+#define alignas(i)
+
 typedef union vec2_u {
     // An array of x, y.
     f32 elements[2];
@@ -37,7 +40,7 @@ typedef union vec3_u {
 } vec3;
 
 typedef union vec4_u {
-#if defined(KUSE_SIMD) 
+#if defined(HUSE_SIMD) 
     // Used for SIMD operations.
     alignas(16) __m128 data;
 #endif
