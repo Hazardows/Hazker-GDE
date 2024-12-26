@@ -699,6 +699,13 @@ HINLINE vec4 vec4_normalized(vec4 vector) {
     return vector;
 }
 
+/**
+ * @brief Returns the dot product between the provided vectors.
+ * 
+ * @param vector_a The first vector.
+ * @param vector_b The second vector.
+ * @return The dot product. 
+ */
 HINLINE f32 vec4_dot_f32(
     f32 a0, f32 a1, f32 a2, f32 a3,
     f32 b0, f32 b1, f32 b2, f32 b3) {
