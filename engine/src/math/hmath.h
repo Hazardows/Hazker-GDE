@@ -526,3 +526,187 @@ HINLINE f32 vec3_distance(vec3 vector_a, vec3 vector_b) {
         vector_a.z - vector_b.z};
     return vec3_length(d);
 }
+
+// ------------------------------------------
+// Vector 4
+// ------------------------------------------
+
+/**
+ * @brief Creates and returns a new 4-element vector using the supplied values.
+ * 
+ * @param x The x value.
+ * @param y The y value.
+ * @param z The z value.
+ * @param w The w value.
+ * @return A new 4-element vector.
+ */
+HINLINE vec4 vec4_create(f32 x, f32 y, f32 z, f32 w) {
+    vec4 vector;
+#if defined(HUSE_SIMD)
+    vector.data = _mm_setr_ps(x, y, z, w);
+#else
+    vector.x = x;
+    vector.y = y;
+    vector.z = z;
+    vector.w = w;
+#endif
+    return vector;
+}
+
+/**
+ * @brief Returns a new vec3 containing the x, y and z components of the 
+ * supplied vec4, essentially dropping the w component.
+ * 
+ * @param vector The 4-component vector to extract from.
+ * @return A new vec3 
+ */
+HINLINE vec3 vec4_to_vec3(vec4 vector) {
+    return (vec3){vector.x, vector.y, vector.z};
+}
+
+/**
+ * @brief Returns a new vec4 using vector as the x, y and z components and w for w.
+ * 
+ * @param vector The 3-component vector.
+ * @param w The w component.
+ * @return A new vec4 
+ */
+HINLINE vec4 vec4_from_vec3(vec3 vector, f32 w) {
+#if defined(HUSE_SIMD)
+    vec4 vector;
+    vector.data = _mm_setr_ps(x, y, z, w);
+    return vector;
+#else
+    return (vec4){vector.x, vector.y, vector.z, w};
+#endif
+}
+
+/**
+ * @brief Creates and returns a 3-component vector with all components set to 0.0f.
+ */
+HINLINE vec4 vec4_zero() {
+    return (vec4){0.0f, 0.0f, 0.0f, 0.0f};
+}
+
+/**
+ * @brief Creates and returns a 3-component vector with all components set to 1.0f.
+ */
+HINLINE vec4 vec4_one() {
+    return (vec4){1.0f, 1.0f, 1.0f, 1.0f};
+}
+
+/**
+ * @brief Adds vector_b to vector_a and returns a copy of the result.
+ * 
+ * @param vector_a The first vector.
+ * @param vector_b The second vector.
+ * @return The resulting vector. 
+ */
+HINLINE vec4 vec4_add(vec4 vector_a, vec4 vector_b) {
+    vec4 result;
+    for (u64 i = 0; i < 4; i++) {
+        result.elements[i] = vector_a.elements[i] + vector_b.elements[i];
+    }
+    return result;
+}
+
+/**
+ * @brief Subtracts vector_b from vector_a and returns a copy of the result.
+ * 
+ * @param vector_a The first vector.
+ * @param vector_b The second vector.
+ * @return The resulting vector. 
+ */
+HINLINE vec4 vec4_sub(vec4 vector_a, vec4 vector_b) {
+    vec4 result;
+    for (u64 i = 0; i < 4; i++) {
+        result.elements[i] = vector_a.elements[i] - vector_b.elements[i];
+    }
+    return result;
+}
+
+/**
+ * @brief Multiplies vector_a by vector_b and returns a copy of the result.
+ * 
+ * @param vector_a The first vector.
+ * @param vector_b The second vector.
+ * @return The resulting vector. 
+ */
+HINLINE vec4 vec4_mul(vec4 vector_a, vec4 vector_b) {
+    vec4 result;
+    for (u64 i = 0; i < 4; i++) {
+        result.elements[i] = vector_a.elements[i] * vector_b.elements[i];
+    }
+    return result;
+}
+
+/**
+ * @brief Divides vector_a by vector_b and returns a copy of the result.
+ * 
+ * @param vector_a The first vector.
+ * @param vector_b The second vector.
+ * @return The resulting vector. 
+ */
+HINLINE vec4 vec4_div(vec4 vector_a, vec4 vector_b) {
+    vec4 result;
+    for (u64 i = 0; i < 4; i++) {
+        result.elements[i] = vector_a.elements[i] / vector_b.elements[i];
+    }
+    return result;
+}
+
+/**
+ * @brief Returns the squared length of the provided vector.
+ * 
+ * @param vector The vector to retrieve the squared length of.
+ * @return The squared length.
+ */
+HINLINE f32 vec4_length_squared(vec4 vector) {
+    return vector.x * vector.x + vector.y * vector.y + vector.z * vector.z + vector.w * vector.w;
+}
+
+/**
+ * @brief Returns the length of the provided vector.
+ * 
+ * @param vector The vector to retrieve the length of.
+ * @return The length.
+ */
+HINLINE f32 vec4_length(vec4 vector) {
+    return hsqrt(vec4_length_squared(vector));
+}
+
+/**
+ * @brief Normalizes the provided vector in place to a unit vector.
+ * 
+ * @param vector A pointer to the vector to be normalized.
+ */
+HINLINE void vec4_normalize(vec4* vector) {
+    const f32 length = vec4_length(*vector);
+    vector->x /= length;
+    vector->y /= length;
+    vector->z /= length;
+    vector->w /= length;
+}
+
+/**
+ * @brief Returns a normalized copy of the supplied vector.
+ * 
+ * @param vector The vector to be normalized.
+ * @return A normalized copy of the supplied vector 
+ */
+HINLINE vec4 vec4_normalized(vec4 vector) {
+    vec4_normalize(&vector);
+    return vector;
+}
+
+HINLINE f32 vec4_dot_f32(
+    f32 a0, f32 a1, f32 a2, f32 a3,
+    f32 b0, f32 b1, f32 b2, f32 b3) {
+    f32 p;
+    p =
+        a0 * b0 +
+        a1 * b1 +
+        a2 * b2 +
+        a3 * b3;
+    return p;
+}
