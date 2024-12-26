@@ -1,0 +1,4 @@
+bin/
+obj/
+
+resizing problem is on vk_renderpass.c ._
