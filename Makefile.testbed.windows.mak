@@ -5,7 +5,7 @@ OBJ_DIR := obj
 ASSEMBLY := testbed
 COMPILED_NAME := testbed
 EXTENSION := .exe
-COMPILER_FLAGS := -g -Wmissing-braces -fdeclspec #-fPIC
+COMPILER_FLAGS := -g -MD -Werror=vla -Wno-missing-braces -fdeclspec #-fPIC
 INCLUDE_FLAGS := -Iengine\src -Itestbed\src
 LINKER_FLAGS := -g -lhazkerEngine.lib -L$(OBJ_DIR)\engine -L$(BUILD_DIR) -lmsvcrtd #-Wl, -rpath, .
 DEFINES := -D_DEBUG -DHIMPORT
@@ -37,7 +37,7 @@ compile: # Compile .c files
 
 .PHONY: clean
 clean: # Clean build directory
-	if exist $(BUILD_DIR)\$(ASSEMBLY)$(EXTENSION) del $(BUILD_DIR)\$(ASSEMBLY)$(EXTENSION)
+	if exist $(BUILD_DIR)\$(COMPILED_NAME)$(EXTENSION) del $(BUILD_DIR)\$(COMPILED_NAME)$(EXTENSION)
 	rmdir /s /q $(OBJ_DIR)\$(ASSEMBLY)
 
 $(OBJ_DIR)/%.c.o: %.c # Compile .c to .c.o object
@@ -47,3 +47,5 @@ $(OBJ_DIR)/%.c.o: %.c # Compile .c to .c.o object
 $(OBJ_DIR)/%.cpp.o: %.cpp # Compile .cpp to .cpp.o object
 	@echo	$<...
 	@clang++ $< $(COMPILER_FLAGS) -c -o $@ $(DEFINES) $(INCLUDE_FLAGS)
+
+-include $(OBJ_FILES:.o=.d)

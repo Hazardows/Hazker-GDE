@@ -24,7 +24,7 @@ REM echo CPP Files: %cppFilenames%
 
 REM Project settings
 SET assembly=testbed
-SET compilerFlags=-g
+SET compilerFlags= -g -MD -Werror=vla -Wno-missing-braces -fdeclspec 
 REM -Wall -Werror
 
 SET includeFlags=-Isrc -I"..\engine\src"

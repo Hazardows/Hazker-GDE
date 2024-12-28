@@ -4,7 +4,7 @@ OBJ_DIR := obj
 ASSEMBLY := engine
 COMPILED_NAME := hazkerEngine
 EXTENSION := .so
-COMPILER_FLAGS := -g -fdeclspec -fPIC
+COMPILER_FLAGS := -g -MD -Werror=vla -fdeclspec -fPIC
 INCLUDE_FLAGS := -Iengine\src -I$(VULKAN_SDK)\include
 LINKER_FLAGS := -g -shared -lvulkan -lxcb -lX11 -lX11-xcb -lxkbcommon -L$(VULKAN_SDK)\Lib -L/usr/X11R6/lib
 DEFINES := -D_DEBUG -DHEXPORT
@@ -32,7 +32,7 @@ compile: # Compile .c files
 
 .PHONY: clean
 clean: # Clean build directory
-	rm -rf $(BUILD_DIR)\$(ASSEMBLY)
+	rm -rf $(BUILD_DIR)\$(COMPILED_NAME)
 	rm -rf $(OBJ_DIR)\$(ASSEMBLY)
 
 $(OBJ_DIR)/%.c.o: %.c # Compile .c to .c.o object

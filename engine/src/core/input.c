@@ -45,10 +45,31 @@ void inputUpdate(f64 deltaTime) {
 }
 
 void input_process_key(keys key, b8 pressed) {
+    if (key == KEY_LALT) {
+        HINFO("Left alt pressed/released");
+    }
+    else if (key == KEY_RALT) {
+        HINFO("Right alt pressed/released");
+    }
+    else if (key == KEY_LCONTROL) {
+        HINFO("Left ctrl pressed/released");
+    }
+    else if (key == KEY_RCONTROL) {
+        HINFO("Right ctrl pressed/released");
+    }
+    else if (key == KEY_LSHIFT) {
+        HINFO("Left shift pressed/released");
+    }
+    else if (key == KEY_RSHIFT) {
+        HINFO("Right shift pressed/released");
+    }
+
     // Only handle this if the state was actually changed
     if (state.kcur.keys[key] != pressed) {
         // Update internal state
         state.kcur.keys[key] = pressed;
+
+        
 
         // Fire an event for inmediate processing
         eventContext context;

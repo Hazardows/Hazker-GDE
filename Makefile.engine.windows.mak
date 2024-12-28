@@ -5,7 +5,7 @@ OBJ_DIR := obj
 ASSEMBLY := engine
 COMPILED_NAME := hazkerEngine
 EXTENSION := .dll
-COMPILER_FLAGS := -g -fdeclspec #-fPIC
+COMPILER_FLAGS := -g -fdeclspec -MD #-fPIC
 INCLUDE_FLAGS := -Iengine\src -I$(VULKAN_SDK)\include
 LINKER_FLAGS := -g -shared -luser32 -lvulkan-1 -L$(VULKAN_SDK)\Lib -L$(OBJ_DIR)\engine
 DEFINES := -D_DEBUG -DHEXPORT -D_CRT_SECURE_NO_WARNINGS
@@ -37,9 +37,11 @@ compile: # Compile .c files
 
 .PHONY: clean
 clean: # Clean build directory
-	if exist $(BUILD_DIR)\$(ASSEMBLY)$(EXTENSION) del $(BUILD_DIR)\$(ASSEMBLY)$(EXTENSION)
+	if exist $(BUILD_DIR)\$(COMPILED_NAME)$(EXTENSION) del $(BUILD_DIR)\$(COMPILED_NAME)$(EXTENSION)
 	rmdir /s /q $(OBJ_DIR)\$(ASSEMBLY)
 
 $(OBJ_DIR)/%.c.o: %.c # Compile .c to .c.o object
 	@echo	$<...
 	@clang $< $(COMPILER_FLAGS) -c -o $@ $(DEFINES) $(INCLUDE_FLAGS)
+
+-include $(OBJ_FILES:.o=.d)

@@ -259,6 +259,31 @@ LRESULT CALLBACK win32_process_message(HWND hWnd, UINT msg, WPARAM wParam, LPARA
             b8 pressed = (msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN);
             keys key = (u16)wParam;
 
+            if (wParam == VK_MENU) {
+                if (GetKeyState(VK_RMENU) & 0x8000) {
+                    key = KEY_RALT;
+                }
+                else if (GetKeyState(VK_LMENU) & 0x8000) {
+                    key = KEY_LALT;
+                }
+            }
+            else if (wParam == VK_SHIFT) {
+                if (GetKeyState(VK_RSHIFT) & 0x8000) {
+                    key = KEY_RSHIFT;
+                }
+                else if (GetKeyState(VK_LSHIFT) & 0x8000) {
+                    key = KEY_LSHIFT;
+                }
+            }
+            else if (wParam == VK_CONTROL) {
+                if (GetKeyState(VK_RCONTROL) & 0x8000) {
+                    key = KEY_RCONTROL;
+                }
+                else if (GetKeyState(VK_LCONTROL) & 0x8000) {
+                    key = KEY_LCONTROL;
+                }
+            }
+
             // Pass to the input subsystem for processing
             input_process_key(key, pressed);
         } break;

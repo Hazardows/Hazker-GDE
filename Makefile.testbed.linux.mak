@@ -4,7 +4,7 @@ OBJ_DIR := obj
 ASSEMBLY := testbed
 COMPILED_NAME := testbed
 EXTENSION := 
-COMPILER_FLAGS := -g -fdeclspec -fPIC
+COMPILER_FLAGS := -g -MD -Werror=vla -fdeclspec -fPIC
 INCLUDE_FLAGS := -Iengine\src -I$(VULKAN_SDK)\include
 LINKER_FLAGS := -L./$(BUILD_DIR)/ -lhazkerEngine -Wl -rpath, .
 DEFINES := -D_DEBUG -DHIMPORT
@@ -33,7 +33,7 @@ compile: # Compile .c files
 
 .PHONY: clean
 clean: # Clean build directory
-	rm -rf $(BUILD_DIR)\$(ASSEMBLY)
+	rm -rf $(BUILD_DIR)\$(COMPILED_NAME)
 	rm -rf $(OBJ_DIR)\$(ASSEMBLY)
 
 $(OBJ_DIR)/%.c.o: %.c # Compile .c to .c.o object

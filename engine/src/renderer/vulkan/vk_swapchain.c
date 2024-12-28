@@ -115,7 +115,6 @@ void create(
     vulkanSwapchain* swapchain) {
     
     VkExtent2D swapchainExtent = { width, height };
-    swapchain->max_frames_in_flight = 2;
 
     // Choose a swap surface format.
     b8 found = false;
@@ -164,6 +163,8 @@ void create(
     if (context->device.swapchain_support.capabilities.maxImageCount > 0 && imageCount > context->device.swapchain_support.capabilities.maxImageCount) {
         imageCount = context->device.swapchain_support.capabilities.maxImageCount;
     }
+
+    swapchain->max_frames_in_flight = imageCount - 1;
 
     // Swapchain create info (SCI)
     VkSwapchainCreateInfoKHR SCI = {VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR};
