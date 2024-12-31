@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus 
+extern "C" { 
+#endif
+
 #include "defines.h"
 
 typedef struct eventContext { // *Without pretext*
@@ -106,3 +110,7 @@ typedef enum systemEventCode {
 
     MAX_EVENT_CODE = 0xFF
 } systemEventCode;
+
+#ifdef __cplusplus
+} 
+#endif

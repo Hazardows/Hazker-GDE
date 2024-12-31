@@ -1,11 +1,16 @@
 #pragma once
 
+#ifdef __cplusplus 
+extern "C" { 
+#endif
+
 #include "defines.h"
 
 typedef enum memoryTag {
     // For temporary use. Should be assigned to one of the bellow or have a new tag created
     MEMORY_TAG_UNKNOWN,
     MEMORY_TAG_ARRAY,
+    MEMORY_TAG_LINEAR_ALLOCATOR,
     MEMORY_TAG_DARRAY,
     MEMORY_TAG_DICT,
     MEMORY_TAG_RING_QUEUE,
@@ -26,7 +31,7 @@ typedef enum memoryTag {
     MEMORY_TAG_MAX_TAGS
 } memoryTag;
 
-HAPI void initializeMemory();
+HAPI void initializeMemory(u64* memory_requirement, void* state);
 HAPI void shutdownMemory();
 
 HAPI void* Hallocate(u64 size, memoryTag tag);
@@ -40,3 +45,9 @@ HAPI void* HcopyMemory(void* dest, const void* source, u64 size);
 HAPI void* HsetMemory(void* dest, i32 value, u64 size);
 
 HAPI char* GetMemoryUsage_str();
+
+HAPI u64 GetMemoryAllocCount();
+
+#ifdef __cplusplus
+} 
+#endif

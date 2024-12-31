@@ -36,6 +36,23 @@
         },
         {
             "type": "shell",
+            "label": "Build Tests",
+            "windows": {
+                "command": "${workspaceFolder}/tests/build.bat"
+            },
+            "linux": {
+                "command": "${workspaceFolder}/tests/build.sh"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/testbed"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build"
+        },
+        {
+            "type": "shell",
             "label": "Build Everything",
             "windows": {
                 "command": "${workspaceFolder}/build-all.bat",

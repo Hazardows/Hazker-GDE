@@ -8,5 +8,15 @@
  - GLFW: https://www.glfw.org/ (macOS)
  - Make: https://gnuwin32.sourceforge.net/packages/make.htm (Windows)
 
-# .goal
-The goal here is simple, to have a game engine capable of making games.
+# .platform support
+ The platforms supported by the game engine are:
+ - Windows.
+ - Linux.
+ - MacOS (Comming soon).
+ - Android (Comming soon).
+ - IOS (Comming soon).
+
+ Console support may also be implemented, but that will be after version 1.0 is released.
+
+ # .goal
+ The goal of this project is to have a game engine with which games can be created.

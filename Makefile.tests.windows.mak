@@ -2,12 +2,12 @@ DIR := $(subst /,\,$(CURDIR))
 BUILD_DIR := bin
 OBJ_DIR := obj
 
-ASSEMBLY := testbed
-COMPILED_NAME := testbed
+ASSEMBLY := tests
+COMPILED_NAME := tests
 EXTENSION := .exe
 COMPILER_FLAGS := -g -MD -Werror=vla -Wno-missing-braces -fdeclspec #-fPIC
 INCLUDE_FLAGS := -Iengine\src -Itestbed\src
-LINKER_FLAGS := -g -lhazkerEngine.lib -L$(OBJ_DIR)\engine -L$(BUILD_DIR) -Xlinker /NODEFAULTLIB:libcmt -lmsvcrtd #-Wl, -rpath, .
+LINKER_FLAGS := -g -lhazkerEngine.lib -L$(OBJ_DIR)\engine -L$(BUILD_DIR) -Xlinker /NODEFAULTLIB:libcmt -lmsvcrtd #-Wl, -rpath, . 
 DEFINES := -D_DEBUG -DHIMPORT
 
 # Make does not offer a recursive wildcard function, so here's one:

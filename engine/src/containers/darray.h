@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus 
+extern "C" { 
+#endif
+
 #include "defines.h"
 
 /*
@@ -61,3 +65,7 @@ HAPI void* _darray_insert_at(void* array, u64 index, void* value_ptr);
 #define darray_stride(array) _darray_field_get(array, DARRAY_STRIDE)
 
 #define darray_length_set(array, value) _darray_field_set(array, DARRAY_LENGTH, value)
+
+#ifdef __cplusplus
+} 
+#endif

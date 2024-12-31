@@ -1,6 +1,6 @@
 #include "renderer/vulkan/vk_command_buffer.h"
 
-#include "core/hmemory.h"
+#include "memory/hmemory.h"
 
 void vulkanCommandBufferAllocate(
     vulkanContext *context,

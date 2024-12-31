@@ -3,6 +3,10 @@
 #include "cpp_functions.hpp"
 #include <stdio.h>
 
+#include <core/input.h>
+#include <core/logger.h>
+#include <memory/hmemory.h>
+
 b8 game_initialize(game* gameInst) {
     printf("Calling C++ function from C code:\n");
     cpp_function();
@@ -11,6 +15,13 @@ b8 game_initialize(game* gameInst) {
 }
 
 b8 game_update(game* gameInst, f32 deltaTime) {
+    static u64 allocCount = 0;
+    u64 prevAllocCount = allocCount;
+    allocCount = GetMemoryAllocCount();
+    if (keyJustPressed('M')) {
+        HDEBUG("Allocations: %llu (%llu this frame)", allocCount, allocCount - prevAllocCount);
+    }
+
     return true;
 }
 

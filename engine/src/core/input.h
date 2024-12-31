@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus 
+extern "C" { 
+#endif
+
 #include "defines.h"
 
 typedef enum buttons {
@@ -168,3 +172,13 @@ HAPI void input_get_previus_mouse_possition(i32* x, i32* y);
 void input_process_button(buttons button, b8 pressed);
 void input_process_mouse_move(i16 x, i16 y);
 void input_process_mouse_wheel(i8 z_delta);
+
+// Context handle definitions.
+#define keyPressed input_key_down(key)
+#define keyReleased input_key_up(key)
+#define keyJustPressed(key) (input_key_down(key) && input_was_key_up(key))
+#define keyJustReleased(key) (input_key_up(key) && input_was_key_down(key))
+
+#ifdef __cplusplus
+} 
+#endif

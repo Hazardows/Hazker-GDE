@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus 
+extern "C" { 
+#endif
+
 #include "defines.h"
 
 #define LOG_WARNING_ENABLED 1
@@ -22,8 +26,17 @@ typedef enum log_level {
     LOG_LEVEL_TRACE = 5
 } log_level;
 
-b8 initLog();
-void shutdownLog();
+/**
+ * @brief Initializes logging system. Call twice; once with state = NULL to get required 
+ * memory size, then a second time passing allocated memory to state.
+ * 
+ * @param memory_requirement A pointer to hold the required memory size of internal state.
+ * @param state NULL if just requesting memory requirement, otherwise allocated block of memory.
+ * @return b8 true on success; otherwise false.
+ */
+b8 initLog(u64* memory_requirement, void* state);
+
+void shutdownLog(void* state);
 
 HAPI void logOutput(log_level level, const char* message, ...);
 
@@ -66,4 +79,8 @@ HAPI void logOutput(log_level level, const char* message, ...);
 #else
 //Does nothing when LOG_TRACE_ENABLED != 1
 #define HTRACE(message, ...)
+#endif
+
+#ifdef __cplusplus
+} 
 #endif

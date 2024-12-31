@@ -1,6 +1,6 @@
 #include "renderer/vulkan/vk_renderpass.h"
 
-#include "core/hmemory.h"
+#include "memory/hmemory.h"
 
 void createVulkanRenderpass(
     vulkanContext *context,

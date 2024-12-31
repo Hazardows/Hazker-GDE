@@ -1,9 +1,13 @@
 #pragma once
 
+#ifdef __cplusplus 
+extern "C" { 
+#endif
+
 #include "defines.h"
 #include "math/math_types.inl"
 
-#include "core/hmemory.h"
+#include "memory/hmemory.h"
 
 #define H_PI 3.14159265358979323846f
 #define H_PI_2 2.0f * H_PI
@@ -1332,3 +1336,7 @@ HINLINE f32 deg_to_rad(f32 degrees) {
 HINLINE f32 red_to_deg(f32 radians) {
     return radians * H_RAD2DEG_MULTIPLIER;
 }
+
+#ifdef __cplusplus
+} 
+#endif

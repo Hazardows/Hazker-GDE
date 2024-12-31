@@ -1,4 +1,7 @@
 bin/
 obj/
 
+# temporary
+engine/src/platform/macos.c
+
 resizing problem is on vk_renderpass.c ._

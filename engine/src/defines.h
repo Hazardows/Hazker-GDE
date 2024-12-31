@@ -18,7 +18,11 @@ typedef double f64;
 
 //Boolean Types
 typedef int b32;
+#ifndef __cplusplus
 typedef _Bool b8;
+#else
+typedef bool b8;
+#endif
 
 //Properly define static assertions
 #if defined(__clang__) || defined(__gcc__)

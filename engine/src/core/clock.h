@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus 
+extern "C" { 
+#endif
+
 #include "defines.h"
 
 typedef struct clock {
@@ -9,10 +13,14 @@ typedef struct clock {
 
 // Updates the provided clock. Should be called just before checking elapsed time.
 // Has no effect on non started clocks.
-void updateClock(clock* clock);
+HAPI void updateClock(clock* clock);
 
 // Starts the provided clock. Resets elapsed time.
-void startClock(clock* clock);
+HAPI void startClock(clock* clock);
 
 // Stops the provided clock. Does not reset elapsed time.
-void stopClock(clock* clock);
+HAPI void stopClock(clock* clock);
+
+#ifdef __cplusplus
+} 
+#endif

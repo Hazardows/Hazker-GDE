@@ -1,4 +1,4 @@
-#include "core/hmemory.h"
+#include "memory/hmemory.h"
 
 #include "core/logger.h"
 #include "platform/platform.h"
@@ -14,6 +14,7 @@ struct memoryStats {
 static const char* memoryTagStrings[MEMORY_TAG_MAX_TAGS] = {
     "UNKNOWN    ",
     "ARRAY      ",
+    "LINEAR ALLC",
     "DARRAY     ",
     "DICT       ",
     "RING_QUEUE ",
@@ -32,14 +33,27 @@ static const char* memoryTagStrings[MEMORY_TAG_MAX_TAGS] = {
     "EVENT      "
 };
 
-static struct memoryStats stats;
+typedef struct memory_system_state {
+    struct memoryStats stats;
+    u64 alloc_count;
+} memory_system_state;
 
-void initializeMemory() {
-    platformZeroMemory(&stats, sizeof(stats));
+static memory_system_state* state_ptr;
+
+void initializeMemory(u64* memory_requirement, void* state) {
+    *memory_requirement = sizeof(memory_system_state);
+    if (state == NULL) {
+        return;
+    } 
+
+    state_ptr = state;
+    state_ptr->alloc_count = 0;
+
+    platformZeroMemory(&state_ptr->stats, sizeof(state_ptr->stats));
 }
 
 void shutdownMemory() {
-
+    state_ptr = NULL;
 }
 
 void* Hallocate(u64 size, memoryTag tag) {
@@ -47,8 +61,11 @@ void* Hallocate(u64 size, memoryTag tag) {
         HWARNING("Hallocate called using MEMORY_TAG_UNKNOWN. Re-class this allocation");
     }
 
-    stats.totalAllocated += size;
-    stats.taggedAllocations[tag] += size;
+    if (state_ptr) {
+        state_ptr->stats.totalAllocated += size;
+        state_ptr->stats.taggedAllocations[tag] += size;
+        state_ptr->alloc_count++;
+    }
 
     // TODO: Memory allignment
     void* block = platformAllocate(size, false);
@@ -62,8 +79,8 @@ void Hfree(void* block, u64 size, memoryTag tag) {
         HWARNING("Hfree called using MEMORY_TAG_UNKNOWN. Re-class this allocation");
     }
 
-    stats.totalAllocated -= size;
-    stats.taggedAllocations[tag] -= size;
+    state_ptr->stats.totalAllocated -= size;
+    state_ptr->stats.taggedAllocations[tag] -= size;
     platformFree(block, false);
 }
 
@@ -85,28 +102,28 @@ char* GetMemoryUsage_str() {
     const u64 kib = 1024;
 
     char buffer[8000] = "System Memory Usage (tagged):\n";
-    u64 offset = strlen(buffer);
+    u64 offset = string_length(buffer);
 
     for (u32 i = 0; i < MEMORY_TAG_MAX_TAGS; i++) {
         char unit[4] = "KiB";
         float amount = 1.0f;
 
-        if (stats.taggedAllocations[i] >= gib) {
+        if (state_ptr->stats.taggedAllocations[i] >= gib) {
             unit[0] = 'G';
-            amount = stats.taggedAllocations[i] / (float)gib;
+            amount = state_ptr->stats.taggedAllocations[i] / (float)gib;
         }
-        else if (stats.taggedAllocations[i] >= mib) {
+        else if (state_ptr->stats.taggedAllocations[i] >= mib) {
             unit[0] = 'M';
-            amount = stats.taggedAllocations[i] / (float)mib;
+            amount = state_ptr->stats.taggedAllocations[i] / (float)mib;
         }
-        else if (stats.taggedAllocations[i] >= kib) {
+        else if (state_ptr->stats.taggedAllocations[i] >= kib) {
             unit[0] = 'K';
-            amount = stats.taggedAllocations[i] / (float)kib;
+            amount = state_ptr->stats.taggedAllocations[i] / (float)kib;
         }
         else {
             unit[0] = 'B';
             unit[1] = 0;
-            amount = (float)stats.taggedAllocations[i];
+            amount = (float)state_ptr->stats.taggedAllocations[i];
         }
 
         i32 length = snprintf(buffer + offset, 8000, "  %s: %.2f%s\n", memoryTagStrings[i], amount, unit);
@@ -114,4 +131,11 @@ char* GetMemoryUsage_str() {
     }
     char* outString = string_duplicate(buffer);
     return outString;
+}
+
+u64 GetMemoryAllocCount() {
+    if (state_ptr) {
+        return state_ptr->alloc_count;
+    }
+    return 0;
 }

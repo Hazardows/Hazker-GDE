@@ -1,7 +1,7 @@
 #include "renderer/vulkan/vk_device.h"
 
 #include "core/logger.h"
-#include "core/hmemory.h"
+#include "memory/hmemory.h"
 #include "containers/darray.h"
 #include "utils/hstring.h"
 

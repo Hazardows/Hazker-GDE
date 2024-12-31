@@ -1,7 +1,9 @@
 // entry.c
 
 #include "game.h"
+
 #include <entry.h>
+#include <memory/hmemory.h>
 
 // Define the function to create a game
 b8 createGame(game* outGame) {
@@ -19,6 +21,8 @@ b8 createGame(game* outGame) {
     // Create the game state.
     outGame->state = Hallocate(sizeof(gameState), MEMORY_TAG_GAME);
     HDEBUG("Game Instance created successfully");
+
+    outGame->appState = NULL;
 
     return true;
 }

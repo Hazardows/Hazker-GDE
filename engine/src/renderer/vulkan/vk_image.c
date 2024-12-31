@@ -2,7 +2,7 @@
 
 #include "renderer/vulkan/vk_device.h"
 
-#include "core/hmemory.h"
+#include "memory/hmemory.h"
 #include "core/logger.h"
 
 void createVulkanImage(

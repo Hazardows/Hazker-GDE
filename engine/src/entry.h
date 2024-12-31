@@ -1,9 +1,12 @@
 #pragma once
 
+#ifdef __cplusplus 
+extern "C" { 
+#endif
+
 #include "core/app.h"
 #include "core/logger.h"
 #include "game_types.h"
-#include "core/hmemory.h"
 
 //Externally defined function to create a game
 extern b8 createGame(game* outGame);
@@ -13,9 +16,6 @@ extern b8 createGame(game* outGame);
 //    * * * * * * * * * * * * * * * * * * * * * * *    //
 
 int main(void) {
-
-    initializeMemory();
-
     //Request the game instance from the application
     game gameInstance;
     if(!createGame(&gameInstance)) {
@@ -41,6 +41,8 @@ int main(void) {
         HINFO("Application did not shutdown gracefully");
         return 2;
     }
-
-    shutdownMemory();
 }
+
+#ifdef __cplusplus
+} 
+#endif

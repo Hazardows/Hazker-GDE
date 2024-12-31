@@ -4,10 +4,12 @@
 #include "core/logger.h"
 
 #include "platform/platform.h"
-#include "core/hmemory.h"
+#include "memory/hmemory.h"
 #include "core/events.h"
 #include "core/input.h"
 #include "core/clock.h"
+
+#include "memory/linear_allocator.h"
 
 #include "renderer/frontend.h"
 
@@ -19,10 +21,16 @@ typedef struct appState {
     i16 width, height;
     clock clock;
     f64 lastTime;
+    linear_allocator systems_allocator;
+
+    u64 memory_system_memory_requirement;
+    void* memory_system_state;
+
+    u64 logging_system_memory_requirement;
+    void* logging_system_state;
 } appState;
 
-static b8 initialized = false;
-static appState app;
+static appState* app;
 
 // Event handlers
 b8 appOnEvent(u16 code, void* sender, void* listenerInstance, eventContext context);
@@ -30,22 +38,39 @@ b8 appOnKey(u16 code, void* sender, void* listenerInstance, eventContext context
 b8 appOnResized(u16 code, void* sender, void* listenerInstance, eventContext context);
 
 b8 appCreate(game* gameInstance) {
-    if(initialized) {
+    if(gameInstance->appState) {
         HERROR("appCreate called more than once");
         return false;
     }
 
-    app.gameInstance = gameInstance;
+    // Allocate memory for app state
+    gameInstance->appState = Hallocate(sizeof(appState), MEMORY_TAG_APPLICATION);
+    app = gameInstance->appState;
+
+    app->gameInstance = gameInstance;
+    app->isRunning = false;
+    app->isSuspended = false;
+
+    u64 sysAllocTotalSize = 64 * 1024 * 1024; // 64 megabytes.
+    create_linear_allocator(sysAllocTotalSize, NULL, &app->systems_allocator);
 
     // Initialize subsystems
-    initLog();
+    // Memory
+    initializeMemory(&app->memory_system_memory_requirement, NULL);
+    app->memory_system_state = allocate_linear_allocator(&app->systems_allocator, app->memory_system_memory_requirement);
+    initializeMemory(&app->memory_system_memory_requirement, app->memory_system_state);
+
+    // Logging
+    initLog(&app->logging_system_memory_requirement, NULL);
+    app->logging_system_state = allocate_linear_allocator(&app->systems_allocator, app->logging_system_memory_requirement);
+    if (!initLog(&app->logging_system_memory_requirement, app->logging_system_state)) {
+        HERROR("Failed to initialize logging system, shutting down...");
+        return false;
+    }
     inputInit();
 
-    app.isRunning = true;
-    app.isSuspended = false;
-
     if(!eventInit()) {
-        HERROR("Event system falied initialization. Application cannot continue.");
+        HERROR("Event system failed initialization. Application cannot continue.");
         return false;
     }
 
@@ -55,38 +80,38 @@ b8 appCreate(game* gameInstance) {
     eventRegister(EVENT_CODE_RESIZED, NULL, appOnResized);
 
     if(!platformStartup(
-        &app.platform,
+        &app->platform,
         gameInstance->config.name,
         gameInstance->config.startPosX, 
         gameInstance->config.startPosY, 
         gameInstance->config.startWidth, 
         gameInstance->config.startHeight)) {
-            return false;
+        
+        return false;
     }
 
-    // Renderer strartup
-    if (!initRenderer(gameInstance->config.name, &app.platform)) {
-        HFATAL("Failed to initialize renderer. Aborting application");
+    // Renderer startup
+    if (!initRenderer(gameInstance->config.name, &app->platform)) {
+        HFATAL("Failed to initialize renderer. Aborting application.");
         return false;
     }
 
     // Initialize the game
-    if(!app.gameInstance->initialize(app.gameInstance)) {
-        HFATAL("Game failed to initialize");
+    if(!app->gameInstance->initialize(app->gameInstance)) {
+        HFATAL("Game failed to initialize.");
         return false;
     }
 
-    app.gameInstance->onResize(app.gameInstance, app.width, app.height);
-
-    initialized = true;
+    app->gameInstance->onResize(app->gameInstance, app->width, app->height);
 
     return true;
 }
 
 b8 appRun() {
-    startClock(&app.clock);
-    updateClock(&app.clock);
-    app.lastTime = app.clock.elapsed;
+    app->isRunning = true;
+    startClock(&app->clock);
+    updateClock(&app->clock);
+    app->lastTime = app->clock.elapsed;
 
     f64 running_time = 0;
     f64 frame_count = 0;
@@ -94,27 +119,27 @@ b8 appRun() {
 
     HINFO(GetMemoryUsage_str());
 
-    while (app.isRunning) {
-        if(!platformPumpMessages(&app.platform)) {
-            app.isRunning = false;
+    while (app->isRunning) {
+        if(!platformPumpMessages(&app->platform)) {
+            app->isRunning = false;
         }
-        if(!app.isSuspended) {
+        if(!app->isSuspended) {
             // Update clock and get delta time.
-            updateClock(&app.clock);
-            f64 curTime = app.clock.elapsed;
-            f64 delta = (curTime - app.lastTime);
+            updateClock(&app->clock);
+            f64 curTime = app->clock.elapsed;
+            f64 delta = (curTime - app->lastTime);
             f64 frame_start_time = platformGetAbsoluteTime();
 
-            if(!app.gameInstance->update(app.gameInstance, (f32)delta)) {
+            if(!app->gameInstance->update(app->gameInstance, (f32)delta)) {
                 HFATAL("Game update failed, shutting down...");
-                app.isRunning = false;
+                app->isRunning = false;
                 break;
             }
 
             //Call the game's render routine
-            if(!app.gameInstance->render(app.gameInstance, (f32)delta)) {
+            if(!app->gameInstance->render(app->gameInstance, (f32)delta)) {
                 HFATAL("Game update failed, shutting down...");
-                app.isRunning = false;
+                app->isRunning = false;
                 break;
             }
 
@@ -147,14 +172,14 @@ b8 appRun() {
             // to be updated before the current frame ends.
             inputUpdate(delta);
 
-            app.lastTime = curTime;
+            app->lastTime = curTime;
 
             // TODO: Delete this
             if(running_time > 0 && frame_count > 0) {}
         }
     }
 
-    app.isRunning = false;
+    app->isRunning = false;
 
     eventUnregister(EVENT_CODE_APPLICATION_QUIT, 0, appOnEvent);
     eventUnregister(EVENT_CODE_KEY_PRESSED, 0, appOnKey);
@@ -162,21 +187,22 @@ b8 appRun() {
 
     eventShutdown();
     shutdownRenderer();
-    platformShutdown(&app.platform);
+    platformShutdown(&app->platform);
+    shutdownMemory();
 
     return true;
 }
 
 void appGetFramebufferSize(u32* width, u32* height) {
-    *width = app.width;
-    *height = app.height;
+    *width = app->width;
+    *height = app->height;
 }
 
 b8 appOnEvent(u16 code, void* sender, void* listenerInstance, eventContext context) {
     switch (code) {
         case EVENT_CODE_APPLICATION_QUIT: {
             HINFO("EVENT_CODE_APPLICATION_QUIT recived, shutting down");
-            app.isRunning = false;
+            app->isRunning = false;
             return true;
         }  
     }
@@ -222,24 +248,24 @@ b8 appOnResized(u16 code, void* sender, void* listenerInstance, eventContext con
         u16 height = context.data.u16[1];
 
         // Check if different. If so, trigger a resize event.
-        if (width != app.width || height != app.height) {
-            app.width = width;
-            app.height = height;
+        if (width != app->width || height != app->height) {
+            app->width = width;
+            app->height = height;
 
             HDEBUG("Window resize: %i, %i", width, height);
 
             // Handle minimization // TODO: this will be optional
             if (width == 0 || height == 0) {
                 HINFO("Window minimized, suspending application");
-                app.isSuspended = true;
+                app->isSuspended = true;
                 return true;
             }
             else {
-                if (app.isSuspended) {
+                if (app->isSuspended) {
                     HINFO("Window restored, resuming application");
-                    app.isSuspended = false;
+                    app->isSuspended = false;
                 }
-                app.gameInstance->onResize(app.gameInstance, width, height);
+                app->gameInstance->onResize(app->gameInstance, width, height);
             }
         }
     }

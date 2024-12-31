@@ -12,7 +12,7 @@
 #include "core/logger.h"
 #include "utils/hstring.h"
 #include "containers/darray.h"
-#include "core/hmemory.h"
+#include "memory/hmemory.h"
 #include "core/app.h"
 
 #include "utils/vk_utils.h"

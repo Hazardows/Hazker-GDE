@@ -1,7 +1,7 @@
 // cpp_functions.cpp
+#include <cpp_functions.hpp>
 
 #include <iostream>
-#include <cpp_functions.hpp>
 
 extern "C" {
     // Test function

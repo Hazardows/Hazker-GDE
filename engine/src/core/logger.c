@@ -6,14 +6,28 @@
 #include <string.h>
 #include <stdarg.h>
 
-b8 initLog() {
+typedef struct logger_system_state {
+    b8 initialized;
+} logger_system_state;
+
+static logger_system_state* state_ptr;
+
+b8 initLog(u64* memory_requirement, void* state) {
+    *memory_requirement = sizeof(logger_system_state);
+    if (state == 0) {
+        return true;
+    }
+
+    state_ptr = state;
+    state_ptr->initialized = true;
+
     // TODO: create log file.
     return true;
 }
 
-
-void shutdownLog() {
+void shutdown_logging(void* state) {
     // TODO: cleanup logging/write queued entries.
+    state_ptr = 0;
 }
 
 void logOutput(log_level level, const char* message, ...) {

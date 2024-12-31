@@ -1,10 +1,13 @@
 #pragma once
 
+#ifdef __cplusplus 
+extern "C" { 
+#endif
+
 #include "defines.h"
 
 typedef struct platformState {
     void* internalState;
-
 } platformState;
 
 b8 platformStartup(platformState* pState, const char* appName, i32 x, i32 y, i32 width, i32 height);
@@ -29,3 +32,7 @@ f64 platformGetAbsoluteTime();
 //Use only for giving time back to the OS for unused update power.
 //Therefore is not exported
 void platformSleep(u64 ms);
+
+#ifdef __cplusplus
+} 
+#endif

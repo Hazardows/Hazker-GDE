@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus 
+extern "C" { 
+#endif
+
 #include "defines.h"
 
 struct game;
@@ -23,3 +27,7 @@ HAPI b8 appCreate(struct game* gameInstance);
 HAPI b8 appRun();
 
 void appGetFramebufferSize(u32* width, u32* height);
+
+#ifdef __cplusplus
+} 
+#endif

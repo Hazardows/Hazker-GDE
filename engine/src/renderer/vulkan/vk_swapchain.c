@@ -4,7 +4,7 @@
 #include "renderer/vulkan/vk_image.h"
 
 #include "core/logger.h"
-#include "core/hmemory.h"
+#include "memory/hmemory.h"
 #include "utils/utils.h"
 
 // Internal methods

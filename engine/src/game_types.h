@@ -25,4 +25,7 @@ typedef struct game {
 
     //Game specific game state, Created and managed by the game
     void* state;
+
+    // Application State.
+    void* appState;
 } game;

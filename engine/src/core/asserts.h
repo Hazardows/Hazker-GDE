@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus 
+extern "C" { 
+#endif
+
 #include "defines.h"
 
 // Disable assertions by commenting out the below line
@@ -41,4 +45,8 @@ HAPI void reportAssertionFailure(const char* expression, const char* message, co
 #define HASSERT(expr)                 // Does nothing
 #define HASSERT_MSG(expr, message)    // Does nothing
 #define HASSERT_DEBUG(expr)           // Does nothing
+#endif
+
+#ifdef __cplusplus
+} 
 #endif
