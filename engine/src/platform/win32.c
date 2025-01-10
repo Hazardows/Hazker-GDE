@@ -51,7 +51,7 @@ b8 platformStartup(platformState* pState, const char* appName, i32 x, i32 y, i32
 
     if (!RegisterClassA(&wc)) {
         MessageBoxA(0, "Window registration failed", "Error", MB_ICONEXCLAMATION | MB_OK);
-        return FALSE;
+        return false;
     }
 
     // Create window
@@ -105,7 +105,7 @@ b8 platformStartup(platformState* pState, const char* appName, i32 x, i32 y, i32
         MessageBoxA(NULL, "Window creation failed!", "Error!", MB_ICONEXCLAMATION | MB_OK);
 
         HFATAL("Window creation failed!");
-        return FALSE;
+        return false;
     } else {
         state->hWnd = handle;
     }
@@ -125,7 +125,7 @@ b8 platformStartup(platformState* pState, const char* appName, i32 x, i32 y, i32
     clockFrequency = 1.0 / (f64)frequency.QuadPart;
     QueryPerformanceCounter(&startTime);
 
-    return TRUE;
+    return true;
 }
 
 void platformShutdown(platformState* pState) {
@@ -145,7 +145,7 @@ b8 platformPumpMessages(platformState* pState) {
         DispatchMessage(&message);
     }
 
-    return TRUE;
+    return true;
 }
 
 void* platformAllocate(u64 size, b8 aligned) {
