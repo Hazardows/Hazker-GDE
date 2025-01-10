@@ -79,9 +79,11 @@ void Hfree(void* block, u64 size, memoryTag tag) {
         HWARNING("Hfree called using MEMORY_TAG_UNKNOWN. Re-class this allocation");
     }
 
-    state_ptr->stats.totalAllocated -= size;
-    state_ptr->stats.taggedAllocations[tag] -= size;
-    platformFree(block, false);
+    if (state_ptr) {
+        state_ptr->stats.totalAllocated -= size;
+        state_ptr->stats.taggedAllocations[tag] -= size;
+        platformFree(block, false);
+    }
 }
 
 void* HzeroMemory(void* block, u64 size) {

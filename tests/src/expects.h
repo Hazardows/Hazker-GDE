@@ -41,7 +41,7 @@
  * @brief Expects actual to be false.
  */
 #define expect_to_be_false(actual)                                                      \
-    if (actual) {                                                                      \
-        HERROR("--> Expected false, but got true. File: %s:%d", __FILE__, __LINE__);   \
-        return 0;                                                                      \
+    if (actual) {                                                                       \
+        HERROR("--> Expected false, but got true. File: %s:%d", __FILE__, __LINE__);    \
+        return 0;                                                                       \
     }
