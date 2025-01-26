@@ -6,20 +6,20 @@ extern "C" {
 
 #include "defines.h"
 
-typedef struct clock {
+typedef struct hclock {
     f64 start_time;
     f64 elapsed;
-} clock;
+} hclock;
 
 // Updates the provided clock. Should be called just before checking elapsed time.
 // Has no effect on non started clocks.
-HAPI void updateClock(clock* clock);
+HAPI void updateClock(hclock* clock);
 
 // Starts the provided clock. Resets elapsed time.
-HAPI void startClock(clock* clock);
+HAPI void startClock(hclock* clock);
 
 // Stops the provided clock. Does not reset elapsed time.
-HAPI void stopClock(clock* clock);
+HAPI void stopClock(hclock* clock);
 
 #ifdef __cplusplus
 } 

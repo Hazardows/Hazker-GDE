@@ -10,7 +10,15 @@ typedef struct platformState {
     void* internalState;
 } platformState;
 
-b8 platformStartup(platformState* pState, const char* appName, i32 x, i32 y, i32 width, i32 height);
+b8 platformStartup(
+    platformState* pState,
+    const char* appName, 
+    i32 x, 
+    i32 y, 
+    i32 width,
+    i32 height
+);
+
 void platformShutdown(platformState* pState);
 b8 platformPumpMessages(platformState* pState);
 

@@ -2,17 +2,17 @@
 
 #include "platform/platform.h"
 
-void updateClock(clock* clock){
+void updateClock(hclock* clock){
     if (clock->start_time != 0) {
         clock->elapsed = platformGetAbsoluteTime() - clock->start_time;
     }
 }
 
-void startClock(clock* clock) {
+void startClock(hclock* clock) {
     clock->start_time = platformGetAbsoluteTime();
     clock->elapsed = 0;
 }
 
-void stopClock(clock* clock) {
+void stopClock(hclock* clock) {
     clock->start_time = 0;
 }

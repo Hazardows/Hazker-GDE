@@ -2,6 +2,10 @@
 
 #include "defines.h"
 
+#ifdef __cplusplus 
+extern "C" { 
+#endif
+
 // Returns the length of the given string
 HAPI u64 string_length(const char* str);
 
@@ -21,3 +25,7 @@ HAPI i32 string_format(char* dest, const char* format, ...);
  * @returns The size of the data written.
  */
 HAPI i32 string_format_v(char* dest, const char* format, void* va_list);
+
+#ifdef __cplusplus
+} 
+#endif

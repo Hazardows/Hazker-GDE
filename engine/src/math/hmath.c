@@ -31,6 +31,10 @@ f32 hsqrt(f32 x) {
     return sqrtf(x);
 }
 
+f32 hpow(f32 x, f32 e) {
+    return pow(x, e);
+}
+
 f32 habs(f32 x) {
     return fabsf(x);
 }

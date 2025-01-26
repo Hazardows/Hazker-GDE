@@ -18,10 +18,9 @@ b8 game_update(game* gameInst, f32 deltaTime) {
     static u64 allocCount = 0;
     u64 prevAllocCount = allocCount;
     allocCount = GetMemoryAllocCount();
-    if (keyJustPressed('M')) {
+    if (keyJustPressed(KEY_M)) {
         HDEBUG("Allocations: %llu (%llu this frame)", allocCount, allocCount - prevAllocCount);
     }
-
     return true;
 }
 

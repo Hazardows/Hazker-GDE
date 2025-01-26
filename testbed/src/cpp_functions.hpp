@@ -1,4 +1,5 @@
 // cpp_functions.hpp
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {

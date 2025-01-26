@@ -14,6 +14,6 @@ int main() {
 
     // Execute tests
     test_manager_run_tests();
-    
+
     return 0;
 }

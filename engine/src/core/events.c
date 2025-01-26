@@ -89,7 +89,7 @@ b8 eventUnregister(u16 code, void* listener, PFNC_onEvent onEvent) {
     }
 
     // If nothing is registered, boot out.
-    if (state.registered[code]->events == 0) {
+    if (state.registered[code]->events == NULL) {
         // TODO: WARNING
         return false;
     }

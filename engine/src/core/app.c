@@ -19,7 +19,7 @@ typedef struct appState {
     b8 isSuspended;
     platformState platform;
     i16 width, height;
-    clock clock;
+    hclock clock;
     f64 lastTime;
     linear_allocator systems_allocator;
 
@@ -55,7 +55,7 @@ b8 appCreate(game* gameInstance) {
     create_linear_allocator(sysAllocTotalSize, NULL, &app->systems_allocator);
 
     // Initialize subsystems
-    // Memory
+   // Memory
     initializeMemory(&app->memory_system_memory_requirement, NULL);
     app->memory_system_state = allocate_linear_allocator(&app->systems_allocator, app->memory_system_memory_requirement);
     initializeMemory(&app->memory_system_memory_requirement, app->memory_system_state);
@@ -74,12 +74,14 @@ b8 appCreate(game* gameInstance) {
         return false;
     }
 
+    // Register for engine-level events
     eventRegister(EVENT_CODE_APPLICATION_QUIT, NULL, appOnEvent);
     eventRegister(EVENT_CODE_KEY_PRESSED, NULL, appOnKey);
     eventRegister(EVENT_CODE_KEY_RELEASED, NULL, appOnKey);
     eventRegister(EVENT_CODE_RESIZED, NULL, appOnResized);
 
-    if(!platformStartup(
+    // Platform
+    if (!platformStartup(
         &app->platform,
         gameInstance->config.name,
         gameInstance->config.startPosX, 
@@ -102,6 +104,7 @@ b8 appCreate(game* gameInstance) {
         return false;
     }
 
+    // Call resize once to ensure the proper size has been set.
     app->gameInstance->onResize(app->gameInstance, app->width, app->height);
 
     return true;
@@ -120,7 +123,7 @@ b8 appRun() {
     HINFO(GetMemoryUsage_str());
 
     while (app->isRunning) {
-        if(!platformPumpMessages(&app->platform)) {
+        if (!platformPumpMessages(&app->platform)) {
             app->isRunning = false;
         }
         if(!app->isSuspended) {
@@ -189,7 +192,7 @@ b8 appRun() {
     shutdownRenderer();
     platformShutdown(&app->platform);
     shutdownMemory();
-
+    
     return true;
 }
 

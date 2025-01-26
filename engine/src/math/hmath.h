@@ -42,6 +42,7 @@ HAPI f32 hcos(f32 x);
 HAPI f32 htan(f32 x);
 HAPI f32 hacos(f32 x);
 HAPI f32 hsqrt(f32 x);
+HAPI f32 hpow(f32 x, f32 e);
 HAPI f32 habs(f32 x);
 
 /**
@@ -229,8 +230,8 @@ HINLINE vec2 vec2_normalized(vec2 vector) {
  * @return True if within tolerance; otherwise false.
  */
 HINLINE b8 vec2_compare(vec2 vector_a, vec2 vector_b, f32 tolerance) {
-    if (habs(vector_a.x - vector_b.x > tolerance)) return false;
-    if (habs(vector_a.y - vector_b.y > tolerance)) return false;
+    if (habs(vector_a.x - vector_b.x) > tolerance) return false;
+    if (habs(vector_a.y - vector_b.y) > tolerance) return false;
     return true;
 }
 

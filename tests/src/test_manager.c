@@ -30,11 +30,11 @@ void test_manager_run_tests() {
 
     u32 count = darray_length(tests);
 
-    clock total_time;
+    hclock total_time;
     startClock(&total_time);
 
     for (u32 i = 0; i < count; i++) {
-        clock test_time;
+        hclock test_time;
         startClock(&test_time);
         u8 result = tests[i].func();
         updateClock(&test_time);

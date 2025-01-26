@@ -3,5 +3,7 @@ obj/
 
 # temporary
 engine/src/platform/macos.c
+engine/src/utils/tween.hpp
+engine/src/utils/tween
 
 resizing problem is on vk_renderpass.c ._
