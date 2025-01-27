@@ -50,31 +50,29 @@ void inputUpdate(f64 deltaTime) {
 }
 
 void input_process_key(keys key, b8 pressed) {
-    if (key == KEY_LALT) {
-        HINFO("Left alt %s.", (pressed ? "pressed" : "released"));
-    }
-    else if (key == KEY_RALT) {
-        HINFO("Right alt %s.", (pressed ? "pressed" : "released"));
-    }
-
-    if (key == KEY_LCONTROL) {
-        HINFO("Left ctrl %s.", (pressed ? "pressed" : "released"));
-    }
-    else if (key == KEY_RCONTROL) {
-        HINFO("Right ctrl %s.", (pressed ? "pressed" : "released"));
-    }
-
-    if (key == KEY_LSHIFT) {
-        HINFO("Left shift %s.", (pressed ? "pressed" : "released"));
-    }
-    else if (key == KEY_RSHIFT) {
-        HINFO("Right shift %s.", (pressed ? "pressed" : "released"));
-    }
-
     // Only handle this if the state was actually changed
-    if (state_ptr->kcur.keys[key] != pressed) {
+    if (state_ptr && state_ptr->kcur.keys[key] != pressed) {
         // Update internal state
         state_ptr->kcur.keys[key] = pressed;
+
+        if (key == KEY_LALT) {
+            HINFO("Left alt %s.", (pressed ? "pressed" : "released"));
+        }
+        else if (key == KEY_RALT) {
+            HINFO("Right alt %s.", (pressed ? "pressed" : "released"));
+        }
+        else if (key == KEY_LCONTROL) {
+            HINFO("Left ctrl %s.", (pressed ? "pressed" : "released"));
+        }
+        else if (key == KEY_RCONTROL) {
+            HINFO("Right ctrl %s.", (pressed ? "pressed" : "released"));
+        }
+        else if (key == KEY_LSHIFT) {
+            HINFO("Left shift %s.", (pressed ? "pressed" : "released"));
+        }
+        else if (key == KEY_RSHIFT) {
+            HINFO("Right shift %s.", (pressed ? "pressed" : "released"));
+        }
 
         // Fire an event for inmediate processing
         eventContext context;
