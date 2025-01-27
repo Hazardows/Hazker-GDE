@@ -3,7 +3,7 @@
 #include "defines.h"
 #include "platform/platform.h"
 
-b8 platformCreateVulkanSurface(platformState *plat_state, vulkanContext* context);
+b8 platformCreateVulkanSurface(vulkanContext* context);
 
 /**
  * Appends the names of required extensions for this platform to

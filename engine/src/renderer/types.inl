@@ -12,7 +12,7 @@ typedef struct rendererBackend {
     struct platformState* plat_state;
     u64 frame_number;
 
-    b8 (*initialize)(struct rendererBackend* backend, const char* app_name, struct platformState* plat_state);
+    b8 (*initialize)(struct rendererBackend* backend, const char* app_name);
     
     void (*shutdown)(struct rendererBackend* backend);
 

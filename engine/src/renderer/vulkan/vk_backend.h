@@ -1,6 +1,6 @@
 #include "renderer/backend.h"
 
-b8 vk_render_backend_init(struct rendererBackend* backend, const char* app_name, struct platformState* plat_state);
+b8 vk_render_backend_init(struct rendererBackend* backend, const char* app_name);
 void vk_render_backend_shutdown(struct rendererBackend* backend);
 
 void vk_render_backend_on_resized(struct rendererBackend* backend, u16 width, u16 height);

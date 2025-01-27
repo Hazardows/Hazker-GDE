@@ -2,9 +2,7 @@
 
 #include "renderer/vulkan/vk_backend.h"
 
-b8 rendererBackendCreate(rendererBackendType type, struct platformState* plat_state, rendererBackend* out_render_backend) {
-    out_render_backend->plat_state = plat_state;
-
+b8 rendererBackendCreate(rendererBackendType type, rendererBackend* out_render_backend) {
     if (type == RENDERER_BACKEND_TYPE_VULKAN) {
         out_render_backend->initialize = vk_render_backend_init;
         out_render_backend->shutdown = vk_render_backend_shutdown;

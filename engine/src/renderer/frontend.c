@@ -4,17 +4,25 @@
 #include "core/logger.h"
 #include "memory/hmemory.h"
 
-// Backend render context
-static rendererBackend* backend = NULL;
+typedef struct rendererSystemState {
+    // Backend render context
+    rendererBackend backend;
+} rendererSystemState;
 
-b8 initRenderer(const char* appName, struct platformState* plat_state) {
-    backend = Hallocate(sizeof(rendererBackend), MEMORY_TAG_RENDERER);
+rendererSystemState* state_ptr;
 
+b8 initRenderer(u64* memory_requirement, void* state, const char* appName) {
+    *memory_requirement = sizeof(rendererSystemState);
+    if (state == NULL) {
+        return true;
+    }
+    state_ptr = state;
+    
     // TODO: Make this configurable
-    rendererBackendCreate(RENDERER_BACKEND_TYPE_VULKAN, plat_state, backend);
-    backend->frame_number = 0;
+    rendererBackendCreate(RENDERER_BACKEND_TYPE_VULKAN, &state_ptr->backend);
+    state_ptr->backend.frame_number = 0;
 
-    if(!backend->initialize(backend, appName, plat_state)) {
+    if(!state_ptr->backend.initialize(&state_ptr->backend, appName)) {
         HFATAL("Renderer backend failed to initialize. Shutting down");
         return false;
     }
@@ -22,24 +30,32 @@ b8 initRenderer(const char* appName, struct platformState* plat_state) {
     return true;
 }
 
-void shutdownRenderer() {
-    backend->shutdown(backend);
-    Hfree(backend, sizeof(rendererBackend), MEMORY_TAG_RENDERER);
+void shutdownRenderer(void* state) {
+    if (state_ptr) {
+        state_ptr->backend.shutdown(&state_ptr->backend);
+    }
+    state_ptr = NULL;
 }
 
 b8 rendererBeginFrame(f32 delta_t) {
-    return backend->beginFrame(backend, delta_t);
+    if (!state_ptr) {
+        return false;
+    }
+    return state_ptr->backend.beginFrame(&state_ptr->backend, delta_t);
 }
 
 b8 rendererEndFrame(f32 delta_t) {
-    b8 result = backend->endFrame(backend, delta_t);
-    backend->frame_number++;
+    if (!state_ptr) {
+        return false;
+    }
+    b8 result = state_ptr->backend.endFrame(&state_ptr->backend, delta_t);
+    state_ptr->backend.frame_number++;
     return result;
 }
 
 void rendererOnResize(u16 width, u16 height) {
-    if (backend) {
-        backend->resized(backend, width, height);
+    if (state_ptr) {
+        state_ptr->backend.resized(&state_ptr->backend, width, height);
     }
     else {
         HWARNING("Renderer backend does not exist to accept resize: %i %i", width, height);

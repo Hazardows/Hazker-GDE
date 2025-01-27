@@ -35,7 +35,7 @@ void create_command_buffers(rendererBackend* backend);
 void regenerate_framebuffers(rendererBackend* backend, vulkanSwapchain* swapchain, vulkanRenderPass* renderpass);
 b8 recreateSwapchain(rendererBackend* backend);
 
-b8 vk_render_backend_init(struct rendererBackend* backend, const char* app_name, struct platformState* plat_state) {
+b8 vk_render_backend_init(struct rendererBackend* backend, const char* app_name) {
     // Function pointers
     context.find_memory_index = find_memory_index;
     
@@ -146,7 +146,7 @@ b8 vk_render_backend_init(struct rendererBackend* backend, const char* app_name,
 
     // Surface creation
     HDEBUG("Creating Vulkan surface...");
-    if (!platformCreateVulkanSurface(plat_state, &context)) {
+    if (!platformCreateVulkanSurface(&context)) {
         HERROR("Failed to create Vulkan surface!");
         return false;
     }

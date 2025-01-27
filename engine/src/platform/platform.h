@@ -10,8 +10,9 @@ typedef struct platformState {
     void* internalState;
 } platformState;
 
-b8 platformStartup(
-    platformState* pState,
+b8 platformStartup(    
+    u64* memory_requirement,
+    void* state,
     const char* appName, 
     i32 x, 
     i32 y, 
@@ -19,8 +20,8 @@ b8 platformStartup(
     i32 height
 );
 
-void platformShutdown(platformState* pState);
-b8 platformPumpMessages(platformState* pState);
+void platformShutdown(void* pState);
+b8 platformPumpMessages();
 
 //Dealing with memory
 void* platformAllocate(u64 size, b8 aligned);

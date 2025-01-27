@@ -19,15 +19,29 @@ typedef struct appState {
     b8 isSuspended;
     platformState platform;
     i16 width, height;
+    
     hclock clock;
     f64 lastTime;
+
     linear_allocator systems_allocator;
+
+    u64 event_system_memory_requirement;
+    void* event_system_state;
 
     u64 memory_system_memory_requirement;
     void* memory_system_state;
 
     u64 logging_system_memory_requirement;
     void* logging_system_state;
+
+    u64 input_system_memory_requirement;
+    void* input_system_state;
+
+    u64 platform_system_memory_requirement;
+    void* platform_system_state;
+
+    u64 renderer_system_memory_requirement;
+    void* renderer_system_state;
 } appState;
 
 static appState* app;
@@ -55,24 +69,28 @@ b8 appCreate(game* gameInstance) {
     create_linear_allocator(sysAllocTotalSize, NULL, &app->systems_allocator);
 
     // Initialize subsystems
-   // Memory
+    // Events subsystem
+    eventInit(&app->event_system_memory_requirement, NULL);
+    app->event_system_state = allocate_linear_allocator(&app->systems_allocator, app->event_system_memory_requirement);
+    eventInit(&app->event_system_memory_requirement, app->event_system_state);
+
+    // Memory subsystem
     initializeMemory(&app->memory_system_memory_requirement, NULL);
     app->memory_system_state = allocate_linear_allocator(&app->systems_allocator, app->memory_system_memory_requirement);
     initializeMemory(&app->memory_system_memory_requirement, app->memory_system_state);
 
-    // Logging
+    // Logging subsystem
     initLog(&app->logging_system_memory_requirement, NULL);
     app->logging_system_state = allocate_linear_allocator(&app->systems_allocator, app->logging_system_memory_requirement);
     if (!initLog(&app->logging_system_memory_requirement, app->logging_system_state)) {
         HERROR("Failed to initialize logging system, shutting down...");
         return false;
     }
-    inputInit();
-
-    if(!eventInit()) {
-        HERROR("Event system failed initialization. Application cannot continue.");
-        return false;
-    }
+    
+    // Input subsystem
+    inputInit(&app->input_system_memory_requirement, NULL);
+    app->input_system_state = allocate_linear_allocator(&app->systems_allocator, app->input_system_memory_requirement);
+    inputInit(&app->input_system_memory_requirement, app->input_system_state);
 
     // Register for engine-level events
     eventRegister(EVENT_CODE_APPLICATION_QUIT, NULL, appOnEvent);
@@ -80,9 +98,12 @@ b8 appCreate(game* gameInstance) {
     eventRegister(EVENT_CODE_KEY_RELEASED, NULL, appOnKey);
     eventRegister(EVENT_CODE_RESIZED, NULL, appOnResized);
 
-    // Platform
+    // Platform subsystem
+    platformStartup(&app->platform_system_memory_requirement, NULL, NULL, 0, 0, 0, 0);
+    app->platform_system_state = allocate_linear_allocator(&app->systems_allocator, app->platform_system_memory_requirement);
     if (!platformStartup(
-        &app->platform,
+        &app->platform_system_memory_requirement,
+        app->platform_system_state,
         gameInstance->config.name,
         gameInstance->config.startPosX, 
         gameInstance->config.startPosY, 
@@ -92,8 +113,10 @@ b8 appCreate(game* gameInstance) {
         return false;
     }
 
-    // Renderer startup
-    if (!initRenderer(gameInstance->config.name, &app->platform)) {
+    // Renderer subsystem
+    initRenderer(&app->renderer_system_memory_requirement, NULL, NULL);
+    app->renderer_system_state = allocate_linear_allocator(&app->systems_allocator, app->renderer_system_memory_requirement);
+    if (!initRenderer(&app->renderer_system_memory_requirement, app->renderer_system_state, gameInstance->config.name)) {
         HFATAL("Failed to initialize renderer. Aborting application.");
         return false;
     }
@@ -123,7 +146,7 @@ b8 appRun() {
     HINFO(GetMemoryUsage_str());
 
     while (app->isRunning) {
-        if (!platformPumpMessages(&app->platform)) {
+        if (!platformPumpMessages()) {
             app->isRunning = false;
         }
         if(!app->isSuspended) {
@@ -176,9 +199,6 @@ b8 appRun() {
             inputUpdate(delta);
 
             app->lastTime = curTime;
-
-            // TODO: Delete this
-            if(running_time > 0 && frame_count > 0) {}
         }
     }
 
@@ -188,10 +208,15 @@ b8 appRun() {
     eventUnregister(EVENT_CODE_KEY_PRESSED, 0, appOnKey);
     eventUnregister(EVENT_CODE_KEY_RELEASED, 0, appOnKey);
 
-    eventShutdown();
-    shutdownRenderer();
-    platformShutdown(&app->platform);
-    shutdownMemory();
+    inputShutdown(app->input_system_state);
+
+    shutdownRenderer(app->renderer_system_state);
+
+    platformShutdown(app->platform_system_state);
+
+    shutdownMemory(app->memory_system_state);
+
+    eventShutdown(app->event_system_state);
     
     return true;
 }

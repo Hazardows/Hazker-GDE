@@ -5,8 +5,8 @@
 struct staticMeshData;
 struct platformState;
 
-b8 initRenderer(const char* appName, struct platformState* plat_state);
-void shutdownRenderer();
+b8 initRenderer(u64* memory_requirement, void* state, const char* appName);
+void shutdownRenderer(void* state);
 
 void rendererOnResize(u16 width, u16 height);
 

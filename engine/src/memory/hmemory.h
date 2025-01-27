@@ -32,7 +32,7 @@ typedef enum memoryTag {
 } memoryTag;
 
 HAPI void initializeMemory(u64* memory_requirement, void* state);
-HAPI void shutdownMemory();
+HAPI void shutdownMemory(void* state);
 
 HAPI void* Hallocate(u64 size, memoryTag tag);
 

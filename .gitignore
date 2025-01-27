@@ -6,4 +6,7 @@ engine/src/platform/macos.c
 engine/src/utils/tween.hpp
 engine/src/utils/tween
 
+# lists
+TODOLIST
+
 resizing problem is on vk_renderpass.c ._

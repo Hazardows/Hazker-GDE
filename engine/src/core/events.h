@@ -27,8 +27,8 @@ typedef struct eventContext { // *Without pretext*
     } data;
 } eventContext;
 
-b8 eventInit();
-void eventShutdown();
+void eventInit(u64* memory_requirement, void* state);
+void eventShutdown(void* state);
 
 //Should return true if handled
 typedef b8 (*PFNC_onEvent)(u16 code, void* sender, void* listenerInstance, eventContext data);

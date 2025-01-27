@@ -20,28 +20,33 @@ typedef struct inputState {
     mouseState mprev;
 } inputState;
 
-static b8 initialized = false;
-static inputState state = {};
+// Internal input state pointer
+static inputState* state_ptr;
 
-void inputInit() {
-    HzeroMemory(&state, sizeof(inputState));
-    initialized = true;
+void inputInit(u64* memory_requirement, void* state) {
+    *memory_requirement = sizeof(inputState);
+    if (state == NULL) {
+        return;
+    }
+    HzeroMemory(state, sizeof(inputState));
+    state_ptr = state;
+
     HINFO("Input subsystem initialized")
 }
 
-void inputShutdown() {
+void inputShutdown(void* state) {
     // TODO: Add shutdown routines when needed
-    initialized = false;
+    state_ptr = NULL;
 }
 
 void inputUpdate(f64 deltaTime) {
-    if(!initialized) {
+    if(!state_ptr) {
         return;
     }
 
     // Copy current state to previous state
-    HcopyMemory(&state.kprev, &state.kcur, sizeof(keyboardState));
-    HcopyMemory(&state.mprev, &state.mcur, sizeof(mouseState));
+    HcopyMemory(&state_ptr->kprev, &state_ptr->kcur, sizeof(keyboardState));
+    HcopyMemory(&state_ptr->mprev, &state_ptr->mcur, sizeof(mouseState));
 }
 
 void input_process_key(keys key, b8 pressed) {
@@ -67,9 +72,9 @@ void input_process_key(keys key, b8 pressed) {
     }
 
     // Only handle this if the state was actually changed
-    if (state.kcur.keys[key] != pressed) {
+    if (state_ptr->kcur.keys[key] != pressed) {
         // Update internal state
-        state.kcur.keys[key] = pressed;
+        state_ptr->kcur.keys[key] = pressed;
 
         // Fire an event for inmediate processing
         eventContext context;
@@ -80,8 +85,8 @@ void input_process_key(keys key, b8 pressed) {
 
 void input_process_button(buttons button, b8 pressed) {
     // If the state changed, fire an event
-    if (state.mcur.buttons[button] != pressed) {
-        state.mcur.buttons[button] = pressed;
+    if (state_ptr->mcur.buttons[button] != pressed) {
+        state_ptr->mcur.buttons[button] = pressed;
 
         // Fire the event
         eventContext context;
@@ -92,13 +97,13 @@ void input_process_button(buttons button, b8 pressed) {
 
 void input_process_mouse_move(i16 x, i16 y) {
     // Only proccess if actually different
-    if (state.mcur.x != x || state.mcur.y != y) {
+    if (state_ptr->mcur.x != x || state_ptr->mcur.y != y) {
         // NOTE: Enable this if debugging
         // HDEBUG("Mouse pos: %i, %i.", x, y);
 
         // Update internal state
-        state.mcur.x = x;
-        state.mcur.y = y;
+        state_ptr->mcur.x = x;
+        state_ptr->mcur.y = y;
 
         // Fire event
         eventContext context;
@@ -118,77 +123,77 @@ void input_process_mouse_wheel(i8 z_delta) {
 }
 
 b8 input_key_down(keys key) {
-    if(!initialized) {
+    if(!state_ptr) {
         return false;
     }
-    return state.kcur.keys[key];
+    return state_ptr->kcur.keys[key];
 }
 
 b8 input_key_up(keys key) {
-    if(!initialized) {
+    if(!state_ptr) {
         return false;
     }
-    return !state.kcur.keys[key];
+    return !state_ptr->kcur.keys[key];
 }
 
 b8 input_was_key_down(keys key) {
-    if(!initialized) {
+    if(!state_ptr) {
         return false;
     }
-    return state.kprev.keys[key];
+    return state_ptr->kprev.keys[key];
 }
 
 b8 input_was_key_up(keys key) {
-    if(!initialized) {
+    if(!state_ptr) {
         return false;
     }
-    return !state.kprev.keys[key];
+    return !state_ptr->kprev.keys[key];
 }
 
 b8 input_is_button_down(buttons button) {
-    if(!initialized) {
+    if(!state_ptr) {
         return false;
     }
-    return state.mcur.buttons[button];
+    return state_ptr->mcur.buttons[button];
 }
 
 b8 input_is_button_up(buttons button) {
-    if(!initialized) {
+    if(!state_ptr) {
         return false;
     }
-    return !state.mcur.buttons[button];
+    return !state_ptr->mcur.buttons[button];
 }
 
 b8 input_was_button_down(buttons button) {
-    if(!initialized) {
+    if(!state_ptr) {
         return false;
     }
-    return state.mprev.buttons[button];
+    return state_ptr->mprev.buttons[button];
 }
 
 b8 input_was_button_up(buttons button) {
-    if(!initialized) {
+    if(!state_ptr) {
         return false;
     }
-    return !state.mprev.buttons[button];
+    return !state_ptr->mprev.buttons[button];
 }
 
 void input_get_mouse_possition(i32* x, i32* y) {
-    if(!initialized) {
+    if(!state_ptr) {
         *x = 0;
         *y = 0;
         return;
     }
-    *x = state.mcur.x;
-    *y = state.mcur.y;
+    *x = state_ptr->mcur.x;
+    *y = state_ptr->mcur.y;
 }
 
 void input_get_previus_mouse_possition(i32* x, i32* y) {
-    if(!initialized) {
+    if(!state_ptr) {
         *x = 0;
         *y = 0;
         return;
     }
-    *x = state.mprev.x;
-    *y = state.mprev.y;
+    *x = state_ptr->mprev.x;
+    *y = state_ptr->mprev.y;
 }
