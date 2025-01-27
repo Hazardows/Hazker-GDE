@@ -10,7 +10,7 @@ LINKER_FLAGS := -g -shared -lvulkan -lxcb -lX11 -lX11-xcb -lxkbcommon -L$(VULKAN
 DEFINES := -D_DEBUG -DHEXPORT
 
 SRC_FILES := $(shell find $(ASSEMBLY) -name *.c) 	# .c files
-CPP_FILES := $(call rwildcard,$(ASSEMBLY)/,*.cpp) # Get all .cpp files
+CPP_FILES := $(shell find $(ASSEMBLY) -name *.cpp) # Get all .cpp files
 DIRECTORIES := $(shell find $(ASSEMBLY) -type d) 	# directories with .h files
 OBJ_FILES := $(SRC_FILES:%=$(OBJ_DIR)/%.o) $(CPP_FILES:%=$(OBJ_DIR)/%.o) # compiled .o objects
 
