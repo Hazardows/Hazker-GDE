@@ -10,8 +10,9 @@ LINKER_FLAGS := -g -shared -lvulkan -lxcb -lX11 -lX11-xcb -lxkbcommon -L$(VULKAN
 DEFINES := -D_DEBUG -DHEXPORT
 
 SRC_FILES := $(shell find $(ASSEMBLY) -name *.c) 	# .c files
+CPP_FILES := $(call rwildcard,$(ASSEMBLY)/,*.cpp) # Get all .cpp files
 DIRECTORIES := $(shell find $(ASSEMBLY) -type d) 	# directories with .h files
-OBJ_FILES := $(SRC_FILES:%=$(OBJ_DIR)/%.o) 			# compiled .o objects
+OBJ_FILES := $(SRC_FILES:%=$(OBJ_DIR)/%.o) $(CPP_FILES:%=$(OBJ_DIR)/%.o) # compiled .o objects
 
 all: scaffold compile link
 
@@ -38,3 +39,9 @@ clean: # Clean build directory
 $(OBJ_DIR)/%.c.o: %.c # Compile .c to .c.o object
 	@echo	$<...
 	@clang $< $(COMPILER_FLAGS) -c -o $@ $(DEFINES) $(INCLUDE_FLAGS)
+
+$(OBJ_DIR)/%.cpp.o: %.cpp # Compile .cpp to .cpp.o object
+	@echo	$<...
+	@clang++ $< $(COMPILER_FLAGS) -c -o $@ $(DEFINES) $(INCLUDE_FLAGS)
+
+-include $(OBJ_FILES:.o=.d)
