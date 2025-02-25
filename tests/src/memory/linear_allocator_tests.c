@@ -45,7 +45,7 @@ u8 linear_allocator_multi_allocation_all_space() {
 
     // Multiple allocations - full.
     void* block;
-    for (u64 i = 0; i < max_allocs; ++i) {
+    for (u64 i = 0; i < max_allocs; i++) {
         block = allocate_linear_allocator(&alloc, sizeof(u64));
         // Validate it
         expect_should_not_be(0, block);
@@ -64,7 +64,7 @@ u8 linear_allocator_multi_allocation_over_allocate() {
 
     // Multiple allocations - full.
     void* block;
-    for (u64 i = 0; i < max_allocs; ++i) {
+    for (u64 i = 0; i < max_allocs; i++) {
         block = allocate_linear_allocator(&alloc, sizeof(u64));
         // Validate it
         expect_should_not_be(0, block);
@@ -91,7 +91,7 @@ u8 linear_allocator_multi_allocation_all_space_then_free() {
 
     // Multiple allocations - full.
     void* block;
-    for (u64 i = 0; i < max_allocs; ++i) {
+    for (u64 i = 0; i < max_allocs; i++) {
         block = allocate_linear_allocator(&alloc, sizeof(u64));
         // Validate it
         expect_should_not_be(0, block);

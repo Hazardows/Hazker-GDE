@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 void cpp_function();
+void cpp_button();
 
 #ifdef __cplusplus
 }

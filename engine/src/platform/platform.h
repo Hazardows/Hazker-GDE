@@ -6,10 +6,6 @@ extern "C" {
 
 #include "defines.h"
 
-typedef struct platformState {
-    void* internalState;
-} platformState;
-
 b8 platformStartup(    
     u64* memory_requirement,
     void* state,

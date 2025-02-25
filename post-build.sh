@@ -6,18 +6,18 @@ mkdir -p bin/assets/shaders
 
 echo "Compiling shaders..."
 
-echo "assets/shaders/Builtin.objShader.vert.glsl -> bin\assets\shaders\Builtin.objShader.vert.spv"
-%VULKAN_SDK%\bin\glslc.exe -fshader-stage=vert assets/shaders/Builtin.objShader.vert.glsl -o bin\assets\shaders\Builtin.objShader.vert.spv
+echo "assets/shaders/Builtin.ObjectShader.vert.glsl -> bin/assets/shaders/Builtin.ObjectShader.vert.spv"
+$VULKAN_SDK/bin/glslc -fshader-stage=vert assets/shaders/Builtin.ObjectShader.vert.glsl -o bin/assets/shaders/Builtin.ObjectShader.vert.spv
 ERRORLEVEL=$?
-if [ $ERRORLEVEL -ne 0] 
+if [ $ERRORLEVEL -ne 0 ]
 then
 echo "Error:"$ERRORLEVEL && exit
 fi
 
-echo "assets/shaders/Builtin.objShader.frag.glsl -> bin\assets\shaders\Builtin.objShader.frag.spv"
-%VULKAN_SDK%\bin\glslc.exe -fshader-stage=vert assets/shaders/Builtin.objShader.frag.glsl -o bin\assets\shaders\Builtin.objShader.frag.spv
+echo "assets/shaders/Builtin.ObjectShader.frag.glsl -> bin/assets/shaders/Builtin.ObjectShader.frag.spv"
+$VULKAN_SDK/bin/glslc -fshader-stage=frag assets/shaders/Builtin.ObjectShader.frag.glsl -o bin/assets/shaders/Builtin.ObjectShader.frag.spv
 ERRORLEVEL=$?
-if [ $ERRORLEVEL -ne 0] 
+if [ $ERRORLEVEL -ne 0 ]
 then
 echo "Error:"$ERRORLEVEL && exit
 fi

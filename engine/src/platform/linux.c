@@ -10,7 +10,7 @@
 
 #include <xcb/xcb.h>
 #include <X11/keysym.h>
-#include <X11/XKBlib.h>  // sudo apt-get install libx11-dev
+#include <X11/XKBlib.h>  // sudo apt install libx11-xcb-dev
 #include <X11/Xlib.h>
 #include <X11/Xlib-xcb.h>  // sudo apt-get install libxkbcommon-x11-dev
 #include <sys/time.h>
@@ -256,7 +256,7 @@ b8 platformPumpMessages() {
 
                     // Fire the event. The application layer should pick this up, but not handle it
                     // as it shouldn be visible to other parts of the application.
-                    event_context context;
+                    eventContext context;
                     context.data.u16[0] = configure_event->width;
                     context.data.u16[1] = configure_event->height;
                     eventFire(EVENT_CODE_RESIZED, 0, context);
@@ -335,7 +335,7 @@ void platformGetRequiredExtensionNames(const char*** names_darray) {
 }
 
 // Surface creation for Vulkan
-b8 platformCreateVulkanSurface(vulkan_context* context) {
+b8 platformCreateVulkanSurface(vulkanContext* context) {
     if(!state_ptr) {
         return false;
     }
@@ -376,7 +376,7 @@ keys translate_keycode(u32 x_keycode) {
             // case : return KEY_ACCEPT;
 
         case XK_Mode_switch: return KEY_MODECHANGE;
-        case XK_Space: return KEY_SPACE;
+        case XK_space: return KEY_SPACE;
         case XK_Prior: return KEY_PRIOR;
         case XK_Next: return KEY_NEXT;
         case XK_End: return KEY_END;

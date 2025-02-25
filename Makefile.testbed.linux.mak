@@ -4,9 +4,9 @@ OBJ_DIR := obj
 ASSEMBLY := testbed
 COMPILED_NAME := testbed
 EXTENSION := 
-COMPILER_FLAGS := -g -MD -Werror=vla -fdeclspec -fPIC
-INCLUDE_FLAGS := -Iengine\src -I$(VULKAN_SDK)\include
-LINKER_FLAGS := -L./$(BUILD_DIR)/ -lhazkerEngine -Wl -rpath, .
+COMPILER_FLAGS := -g -MD -Werror=vla -Wno-missing-braces -fdeclspec -fPIC
+INCLUDE_FLAGS := -I$(PWD)/engine/src -I$(PWD)/testbed/src -I$(VULKAN_SDK)/include
+LINKER_FLAGS := -g -L./$(BUILD_DIR)/ -lhazkerEngine -Wl,-rpath,$(BUILD_DIR) -lm -lstdc++
 DEFINES := -D_DEBUG -DHIMPORT
 
 SRC_FILES := $(shell find $(ASSEMBLY) -name *.c) 	# .c files
@@ -43,3 +43,5 @@ $(OBJ_DIR)/%.c.o: %.c # Compile .c to .c.o object
 $(OBJ_DIR)/%.cpp.o: %.cpp # Compile .cpp to .cpp.o object
 	@echo	$<...
 	@clang++ $< $(COMPILER_FLAGS) -c -o $@ $(DEFINES) $(INCLUDE_FLAGS)
+
+-include $(OBJ_FILES:.o=.d)

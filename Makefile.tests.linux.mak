@@ -4,10 +4,10 @@ OBJ_DIR := obj
 
 ASSEMBLY := tests
 COMPILED_NAME := tests
-EXTENSION := .exe
+EXTENSION := 
 COMPILER_FLAGS := -g -MD -Werror=vla -Wno-missing-braces -fdeclspec #-fPIC
-INCLUDE_FLAGS := -Iengine\src -Itestbed\src
-LINKER_FLAGS := -g -lhazkerEngine.lib -L$(OBJ_DIR)\engine -L$(BUILD_DIR) -Xlinker /NODEFAULTLIB:libcmt -lmsvcrtd #-Wl, -rpath, . 
+INCLUDE_FLAGS := -I$(PWD)/engine/src -I$(PWD)testbed\src
+LINKER_FLAGS := -g -lhazkerEngine -L$(OBJ_DIR)\engine -L$(BUILD_DIR) -lm #-Wl, -rpath, . 
 DEFINES := -D_DEBUG -DHIMPORT
 
 SRC_FILES := $(shell find $(ASSEMBLY) -name *.c)   # Get all .c files

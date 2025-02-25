@@ -1,27 +1,27 @@
 #!/bin/bash
-# Build script for rebuilding everything
-set echo on
+# Build Everything
 
 echo "Building everything..."
 
-
-pushd engine
-source build.sh
-popd
-
-ERRORLEVEL=$?
-if [ $ERRORLEVEL -ne 0 ]
-then
-echo "Error:"$ERRORLEVEL && exit
+# Engine
+make -f "Makefile.engine.linux.mak" all
+if [ $? -ne 0 ]; then
+    echo "Error: $?"
+    exit 1
 fi
 
-pushd testbed
-source build.sh
-popd
-ERRORLEVEL=$?
-if [ $ERRORLEVEL -ne 0 ]
-then
-echo "Error:"$ERRORLEVEL && exit
+# Testbed
+make -f "Makefile.testbed.linux.mak" all
+if [ $? -ne 0 ]; then
+    echo "Error: $?"
+    exit 1
+fi
+
+# Tests
+make -f "Makefile.tests.linux.mak" all
+if [ $? -ne 0 ]; then
+    echo "Error: $?"
+    exit 1
 fi
 
 echo "All assemblies built successfully."

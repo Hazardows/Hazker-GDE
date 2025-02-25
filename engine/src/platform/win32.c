@@ -80,8 +80,8 @@ b8 platformStartup(u64* memory_requirement, void* state, const char* appName, i3
 
     windowStyle |= WS_MINIMIZEBOX;
     // Window resizing, disabled because of exceptions on resize
-    // windowStyle |= WS_MAXIMIZEBOX;
-    // windowStyle |= WS_THICKFRAME;
+    windowStyle |= WS_MAXIMIZEBOX;
+    windowStyle |= WS_THICKFRAME;
 
 
     // Obtain the size of the border

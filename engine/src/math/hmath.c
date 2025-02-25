@@ -6,7 +6,7 @@
 
 // ****************************************************************** //
 // *  Note that this are here in order to prevent having to import  * //
-// *  the entire <math.h> everywhere.                               * //
+// *  the entire <math.h> / <cmath> everywhere.                     * //
 // ****************************************************************** //
 
 static b8 rand_seeded = false;

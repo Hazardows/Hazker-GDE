@@ -174,10 +174,15 @@ void input_process_mouse_move(i16 x, i16 y);
 void input_process_mouse_wheel(i8 z_delta);
 
 // Context handle definitions.
-#define keyPressed input_key_down(key)
-#define keyReleased input_key_up(key)
+#define keyPressed(key) input_key_down(key)
+#define keyReleased(key) input_key_up(key)
 #define keyJustPressed(key) (input_key_down(key) && input_was_key_up(key))
 #define keyJustReleased(key) (input_key_up(key) && input_was_key_down(key))
+
+#define buttonPressed(button) input_is_button_down(button)
+#define buttonReleased(button) input_is_button_up(button)
+#define buttonJustPressed(button) (input_is_button_down(button) && input_was_button_up(button))
+#define buttonJustReleased(button) (input_is_button_up(button) && input_was_button_down(button))
 
 #ifdef __cplusplus
 } 

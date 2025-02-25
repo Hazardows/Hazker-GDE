@@ -3,12 +3,24 @@
 #include "defines.h"
 #include "core/asserts.h"
 
+#include "renderer/types.inl"
+
 #include <vulkan/vulkan.h>
 
 // Checks the given expresion's return value against VK_SUCCESS
 #define VK_CHECK(expr) {             \
     HASSERT(expr == VK_SUCCESS);     \
 }
+
+typedef struct vulkanBuffer {
+    u64 total_size;
+    VkBuffer handle;
+    VkBufferUsageFlagBits usage;
+    b8 is_locked;
+    VkDeviceMemory memory;
+    i32 memory_index;
+    u32 memory_property_flags;
+} vulkanBuffer;
 
 typedef struct vk_swapchain_support_info {
     VkSurfaceCapabilitiesKHR capabilities;
@@ -110,6 +122,37 @@ typedef struct vulkanFence {
     b8 isSignaled;
 } vulkanFence;
 
+typedef struct vkShaderStage {
+    VkShaderModuleCreateInfo createInfo;
+    VkShaderModule handle;
+    VkPipelineShaderStageCreateInfo shaderStageCreateInfo;
+} vkShaderStage;
+
+typedef struct vulkanPipeline {
+    VkPipeline handle;
+    VkPipelineLayout pipelineLayout;
+} vulkanPipeline;
+
+#define OBJECT_SHADER_STAGE_COUNT 2
+typedef struct vkObjectShader {
+    // vertex, fragment
+    vkShaderStage stages[OBJECT_SHADER_STAGE_COUNT];
+
+    VkDescriptorPool globalDescriptorPool;
+    VkDescriptorSetLayout globalDescriptorSetLayout;
+
+    // One descriptor set per frame (max 3 for triple-buffering)
+    VkDescriptorSet globalDescriptorSets[3];
+
+    // Global uniform object
+    globalUniformObject global_ubo;
+
+    // Global uniform buffer
+    vulkanBuffer globalUniformBuffer;
+
+    vulkanPipeline pipeline;
+} vkObjectShader;
+
 typedef struct vulkanContext {
     // Framebuffer properties
     u32 framebuffer_width;
@@ -137,6 +180,9 @@ typedef struct vulkanContext {
     vulkanSwapchain swapchain;
     vulkanRenderPass main_renderpass;
 
+    vulkanBuffer object_vertex_buffer;
+    vulkanBuffer object_index_buffer;
+
     // darray
     vulkanCommandBuffer* graphics_command_buffers;
 
@@ -154,6 +200,11 @@ typedef struct vulkanContext {
     u32 curFrame;
 
     b8 recreating_swapchain;
+
+    vkObjectShader objectShader;
+
+    u64 geometry_vertex_offset;
+    u64 geometry_index_offset;
 
     i32 (*find_memory_index)(u32 type_filter, u32 property_flags);
 } vulkanContext;

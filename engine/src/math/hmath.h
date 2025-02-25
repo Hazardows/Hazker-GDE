@@ -903,7 +903,7 @@ HINLINE mat4 mat4_transposed(mat4 matrix) {
  * @param matrix The matrix to be inverted.
  * @return A inverted copy of the provided matrix.
  */
-HINLINE mat4 mat4_inverse(mat4 matrix)  {
+HINLINE mat4 mat4_inverse(mat4 matrix) {
     const f32* m = matrix.data;
 
     f32 t0 = m[10] * m[15];
@@ -962,13 +962,11 @@ HINLINE mat4 mat4_inverse(mat4 matrix)  {
 }
 
 HINLINE mat4 mat4_translation(vec3 position) {
-    mat4 matrix = mat4_identity();
-    
-    matrix.data[12] = position.x;
-    matrix.data[13] = position.y;
-    matrix.data[14] = position.z;
-
-    return matrix;
+    mat4 out_matrix = mat4_identity();
+    out_matrix.data[12] = position.x;
+    out_matrix.data[13] = position.y;
+    out_matrix.data[14] = position.z;
+    return out_matrix;
 }
 
 /**

@@ -2,15 +2,15 @@
 # Build script for testbed
 set echo on
 
-echo "Building Testbed..."
+echo "Building Tests..."
 
 cd ..
 
 mkdir -p bin
-make -f "Makefile.testbed.linux.mak" all 
+make -f "Makefile.tests.linux.mak" all 
 if [ $? -ne 0 ]; then
     echo "Error: $?"
     exit 1
 fi
 
-echo "Testbed built successfully."
+echo "Tests built successfully."

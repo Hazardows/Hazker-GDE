@@ -3,7 +3,7 @@
 #include <containers/darray.h>
 #include <core/logger.h>
 #include <utils/hstring.h>
-#include <core/clock.h>
+#include <core/hclock.h>
 
 typedef struct test_entry {
     PFN_test func;
@@ -41,10 +41,12 @@ void test_manager_run_tests() {
 
         if (result == true) {
             ++passed;
-        } else if (result == BYPASS) {
+        } 
+        else if (result == BYPASS) {
             HWARNING("[SKIPPED]: %s", tests[i].desc);
             ++skipped;
-        } else {
+        } 
+        else {
             HERROR("[FAILED]: %s", tests[i].desc);
             ++failed;
         }

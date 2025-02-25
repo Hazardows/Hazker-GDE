@@ -8,6 +8,7 @@
 #include "renderer/vulkan/vk_command_buffer.h"
 #include "renderer/vulkan/vk_framebuffer.h"
 #include "renderer/vulkan/vk_fence.h"
+#include "renderer/vulkan/vk_buffer.h"
 
 #include "core/logger.h"
 #include "utils/hstring.h"
@@ -17,6 +18,10 @@
 
 #include "utils/vk_utils.h"
 #include "platform/platform.h"
+#include "math/math_types.inl"
+
+// Shaders
+#include "renderer/vulkan/shaders/vk_object_shader.h"
 
 // Static Vulkan context
 static vulkanContext context;
@@ -31,11 +36,28 @@ VKAPI_ATTR VkBool32 VKAPI_CALL vk_debug_callback(
 );
 
 i32 find_memory_index(u32 type_filter, u32 property_flags);
+b8 create_buffers(vulkanContext* context);
 void create_command_buffers(rendererBackend* backend);
 void regenerate_framebuffers(rendererBackend* backend, vulkanSwapchain* swapchain, vulkanRenderPass* renderpass);
 b8 recreateSwapchain(rendererBackend* backend);
 
-b8 vk_render_backend_init(struct rendererBackend* backend, const char* app_name) {
+void upload_data_range(vulkanContext* context, VkCommandPool pool, VkFence fence, VkQueue queue, vulkanBuffer* buffer, u64 offset, u64 size, void* data) {
+    // Create a host-visible staging buffer to upload to. Mark it as the source of the transfer.
+    VkBufferUsageFlags flags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+    vulkanBuffer staging;
+    vulkanBuffer_create(context, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, flags, true, &staging);
+
+    // Load the data into the staging buffer.
+    vulkanBuffer_load_data(context, &staging, 0, size, 0, data);
+
+    // Perform the copy from the staging buffer to the device local buffer.
+    vulkanBuffer_copy_to(context, pool, fence, queue, staging.handle, 0, buffer->handle, offset, size);
+
+    // Clean up the staging buffer.
+    vulkanBuffer_destroy(context, &staging);
+}
+
+b8 vk_renderer_backend_init(struct rendererBackend* backend, const char* app_name) {
     // Function pointers
     context.find_memory_index = find_memory_index;
     
@@ -206,14 +228,53 @@ b8 vk_render_backend_init(struct rendererBackend* backend, const char* app_name)
         context.imagesInFlight[i] = NULL;
     }
 
+    if (!vk_create_object_shader(&context, &context.objectShader)) {
+        HERROR("Error loading built-in basic_lighting shader");
+        return false;
+    }
+
+    create_buffers(&context);
+
+    // TODO: tomporary test code
+        #define vert_count 4
+        vertex_3d verts[vert_count];
+        HzeroMemory(verts, sizeof(vertex_3d) * vert_count);
+
+        const f32 f = 10.0f;
+
+        verts[0].position.x = -0.5 * f;
+        verts[0].position.y = -0.5 * f;
+
+        verts[1].position.x = 0.5 * f;
+        verts[1].position.y = 0.5 * f;
+
+        verts[2].position.x = -0.5 * f;
+        verts[2].position.y = 0.5 * f;
+
+        verts[3].position.x = 0.5 * f;
+        verts[3].position.y = -0.5 * f;
+
+        const u32 index_count = 6;
+        u32 indices[] = {0, 1, 2, 0, 3, 1};
+
+        upload_data_range(&context, context.device.graphics_command_pool, NULL, context.device.graphics_queue, &context.object_vertex_buffer, 0, sizeof(vertex_3d) * vert_count, verts);
+        upload_data_range(&context, context.device.graphics_command_pool, NULL, context.device.graphics_queue, &context.object_index_buffer, 0, sizeof(u32) * index_count, indices);
+    // TODO: end temporary test code
+
     HINFO("Vulkan renderer initialized successfully.");
     return true;
 }
 
-void vk_render_backend_shutdown(struct rendererBackend* backend) { 
+void vk_renderer_backend_shutdown(struct rendererBackend* backend) { 
     vkDeviceWaitIdle(context.device.logical_device);
 
     // Destroy in the oposite order of creation.
+    
+    // Destroy buffers
+    vulkanBuffer_destroy(&context, &context.object_vertex_buffer);
+    vulkanBuffer_destroy(&context, &context.object_index_buffer);
+
+    vk_destroy_object_shader(&context, &context.objectShader);
 
     for (u8 i = 0; i < context.swapchain.max_frames_in_flight; i++) {
         if (context.imageAvailableSemaphores[i]) {
@@ -295,7 +356,7 @@ void vk_render_backend_shutdown(struct rendererBackend* backend) {
     vkDestroyInstance(context.instance, context.allocator);
 }
 
-void vk_render_backend_on_resized(rendererBackend* backend, u16 width, u16 height) {
+void vk_renderer_backend_on_resized(rendererBackend* backend, u16 width, u16 height) {
     // Updates the frame_buffer_size_generation, a counter which indicates
     // when the frame buffer size has been updated.
     cached_framebuffer_width = width;
@@ -305,7 +366,7 @@ void vk_render_backend_on_resized(rendererBackend* backend, u16 width, u16 heigh
     HINFO("Vulkan renderer backend->resized w/h/gen: %i/%i/%llu", width, height, context.framebuffer_size_generation);
 }
 
-b8 vk_render_backend_begin_frame(struct rendererBackend* backend, f32 delta_t) {
+b8 vk_renderer_backend_begin_frame(struct rendererBackend* backend, f32 delta_t) {
     vulkanDevice* device = &context.device;
 
     // Check if recreating swap chain and boot out.
@@ -398,7 +459,18 @@ b8 vk_render_backend_begin_frame(struct rendererBackend* backend, f32 delta_t) {
     return true;
 }
 
-b8 vk_render_backend_end_frame(struct rendererBackend* backend, f32 delta_t) {
+void vk_renderer_update_global_state(mat4 projection, mat4 view, vec3 view_position, vec4 ambient_colour, i32 mode) {    
+    vk_use_object_shader(&context, &context.objectShader);
+
+    context.objectShader.global_ubo.projection = projection;
+    context.objectShader.global_ubo.view = view;
+
+    // TODO: other ubo properties
+
+    vk_update_object_shader_global_state(&context, &context.objectShader);
+}
+
+b8 vk_renderer_backend_end_frame(struct rendererBackend* backend, f32 delta_t) {
     vulkanCommandBuffer* commandBuffer = &context.graphics_command_buffers[context.imageIndex];
     
     // End renderpass
@@ -469,6 +541,25 @@ b8 vk_render_backend_end_frame(struct rendererBackend* backend, f32 delta_t) {
     return true;
 }
 
+
+void vk_backend_update_object(mat4 model) {
+    vk_update_object_shader(&context, &context.objectShader, model);
+
+    // TODO: temporary test code
+        vulkanCommandBuffer* commandBuffer = &context.graphics_command_buffers[context.imageIndex];
+        vk_use_object_shader(&context, &context.objectShader);
+
+        // Bind vertex buffer at offset.
+        VkDeviceSize offsets[1] = {0};
+        vkCmdBindVertexBuffers(commandBuffer->handle, 0, 1, &context.object_vertex_buffer.handle, (VkDeviceSize*)offsets);
+        
+        // Bind index buffer at offset.
+        vkCmdBindIndexBuffer(commandBuffer->handle, context.object_index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
+        
+        // Issue the draw.
+        vkCmdDrawIndexed(commandBuffer->handle, 6, 1, 0, 0, 0);
+    // TODO: end temporary test code
+}
 
 VKAPI_ATTR VkBool32 VKAPI_CALL vk_debug_callback(
     VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
@@ -639,4 +730,36 @@ b8 recreateSwapchain(rendererBackend* backend) {
     HTRACE("swapchain recreated.");
 
     return false;
+}
+
+b8 create_buffers(vulkanContext* context) {
+    VkMemoryPropertyFlagBits memory_property_flags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+
+    const u64 vertex_buffer_size =  sizeof(vertex_3d) * 1024 * 1024;
+    if (!vulkanBuffer_create(
+            context, 
+            vertex_buffer_size,
+            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+            memory_property_flags,
+            true,
+            &context->object_vertex_buffer)) {
+        HERROR("Error creating vertex buffer.");
+        return false;
+    }
+    context->geometry_vertex_offset = 0;
+
+    const u64 index_buffer_size = sizeof(u32) * 1024 * 1024;
+    if (!vulkanBuffer_create(
+            context,
+            index_buffer_size,
+            VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+            memory_property_flags,
+            true,
+            &context->object_index_buffer)) {
+        HERROR("Error creating index buffer.");
+        return false;            
+    }
+    context->geometry_index_offset = 0;
+
+    return true;
 }

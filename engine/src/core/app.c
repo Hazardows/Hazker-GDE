@@ -7,7 +7,7 @@
 #include "memory/hmemory.h"
 #include "core/events.h"
 #include "core/input.h"
-#include "core/clock.h"
+#include "core/hclock.h"
 
 #include "memory/linear_allocator.h"
 
@@ -17,7 +17,6 @@ typedef struct appState {
     game* gameInstance;
     b8 isRunning;
     b8 isSuspended;
-    platformState platform;
     i16 width, height;
     
     hclock clock;
@@ -207,6 +206,7 @@ b8 appRun() {
     eventUnregister(EVENT_CODE_APPLICATION_QUIT, 0, appOnEvent);
     eventUnregister(EVENT_CODE_KEY_PRESSED, 0, appOnKey);
     eventUnregister(EVENT_CODE_KEY_RELEASED, 0, appOnKey);
+    eventUnregister(EVENT_CODE_RESIZED, 0, appOnResized);
 
     inputShutdown(app->input_system_state);
 
@@ -294,6 +294,7 @@ b8 appOnResized(u16 code, void* sender, void* listenerInstance, eventContext con
                     app->isSuspended = false;
                 }
                 app->gameInstance->onResize(app->gameInstance, width, height);
+                rendererOnResize(width, height);
             }
         }
     }

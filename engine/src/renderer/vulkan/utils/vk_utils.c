@@ -1,4 +1,4 @@
-#include "utils/vk_utils.h"
+#include "renderer/vulkan/utils/vk_utils.h"
 
 // From: https://www.khronos.org/registry/vulkan/specs/1.2-extensions/man/html/VkResult.html
 // (Massive copypaste XDDD)

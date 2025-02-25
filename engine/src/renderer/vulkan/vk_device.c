@@ -261,7 +261,7 @@ b8 selectPhysicalDevice(vulkanContext* context) {
         return false;
     }
 
-    const u32 max_device_count = 32;
+    #define max_device_count 32
     VkPhysicalDevice physicalDevices[max_device_count];
     VK_CHECK(vkEnumeratePhysicalDevices(context->instance, &physicalDeviceCount, physicalDevices));
     for (u32 i = 0; i < physicalDeviceCount; i++) {

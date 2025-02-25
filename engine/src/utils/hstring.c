@@ -36,7 +36,7 @@ i32 string_format_v(char* dest, const char* format, void* va_listp) {
         // Big, but can fit on the stack.
         char buffer[32000];
         i32 written = vsnprintf(buffer, 32000, format, va_listp);
-        buffer[written] = NULL;
+        buffer[written] = 0;
         HcopyMemory(dest, buffer, written + 1);
 
         return written;

@@ -2,20 +2,15 @@
 # Build script for engine
 set echo on
 
-mkdir -p ../bin
+echo "Building Engine..."
 
-# Get a list of all the .c files.
-cFilenames=$(find . -type f -name "*.c")
+cd ..
 
-# echo "Files:" $cFilenames
+mkdir -p bin
+make -f "Makefile.engine.linux.mak" all 
+if [ $? -ne 0 ]; then
+    echo "Error: $?"
+    exit 1
+fi
 
-assembly="hazkerEngine"
-compilerFlags="-g -shared -fdeclspec -fPIC"
-# -fms-extensions 
-# -Wall -Werror
-includeFlags="-Isrc -I$VULKAN_SDK/include"
-linkerFlags="-lvulkan -lxcb -lX11 -lX11-xcb -lxkbcommon -L$VULKAN_SDK/lib -L/usr/X11R6/lib"
-defines="-D_DEBUG -DKEXPORT"
-
-echo "Building $assembly..."
-clang $cFilenames $compilerFlags -o ../bin/lib$assembly.so $defines $includeFlags $linkerFlags
+echo "Engine built successfully."

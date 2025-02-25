@@ -1,6 +1,11 @@
 bin/
 obj/
 
+# Linux Build ID's (WSL)
+Makefile.testbed.linux.makZone.Identifier
+Makefile.engine.linux.makZone.Identifier
+Makefile.tests.linux.makZone.Identifier
+
 # temporary
 engine/src/platform/macos.c
 engine/src/utils/tween.hpp

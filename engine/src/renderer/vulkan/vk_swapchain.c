@@ -156,8 +156,8 @@ void create(
     // Clamp to the value allowed by the GPU
     VkExtent2D min = context->device.swapchain_support.capabilities.minImageExtent;
     VkExtent2D max = context->device.swapchain_support.capabilities.maxImageExtent;
-    swapchainExtent.width = clamp(swapchainExtent.width, min.width, max.width);
-    swapchainExtent.height = clamp(swapchainExtent.height, min.height, max.height);
+    swapchainExtent.width = HCLAMP(swapchainExtent.width, min.width, max.width);
+    swapchainExtent.height = HCLAMP(swapchainExtent.height, min.height, max.height);
 
     u32 imageCount = context->device.swapchain_support.capabilities.minImageCount + 1;
     if (context->device.swapchain_support.capabilities.maxImageCount > 0 && imageCount > context->device.swapchain_support.capabilities.maxImageCount) {

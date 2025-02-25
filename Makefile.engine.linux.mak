@@ -5,7 +5,7 @@ ASSEMBLY := engine
 COMPILED_NAME := hazkerEngine
 EXTENSION := .so
 COMPILER_FLAGS := -g -MD -Werror=vla -fdeclspec -fPIC
-INCLUDE_FLAGS := -Iengine\src -I$(VULKAN_SDK)\include
+INCLUDE_FLAGS := -I$(PWD)/engine/src -I$(VULKAN_SDK)\include
 LINKER_FLAGS := -g -shared -lvulkan -lxcb -lX11 -lX11-xcb -lxkbcommon -L$(VULKAN_SDK)\Lib -L/usr/X11R6/lib
 DEFINES := -D_DEBUG -DHEXPORT
 
